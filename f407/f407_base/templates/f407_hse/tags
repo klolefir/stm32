@@ -1,0 +1,24 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	//
+ISR_VECTOR_SIZE_WORDS	startup.c	/^#define ISR_VECTOR_SIZE_WORDS /;"	d	file:
+LED1_PIN	main.c	/^#define LED1_PIN /;"	d	file:
+LED2_PIN	main.c	/^#define LED2_PIN /;"	d	file:
+SRAM_END	startup.c	/^#define SRAM_END /;"	d	file:
+SRAM_SIZE	startup.c	/^#define SRAM_SIZE /;"	d	file:
+SRAM_START	startup.c	/^#define SRAM_START /;"	d	file:
+STACK_POINTER_INIT_ADDRESS	startup.c	/^#define STACK_POINTER_INIT_ADDRESS /;"	d	file:
+default_handler	startup.c	/^void default_handler(void)$/;"	f	typeref:typename:void
+delay_ms	main.c	/^void delay_ms(uint32_t ms)$/;"	f	typeref:typename:void
+hse_init	main.c	/^void hse_init()$/;"	f	typeref:typename:void
+isr_vector	startup.c	/^uint32_t isr_vector[ISR_VECTOR_SIZE_WORDS] __attribute__((section(".isr_vector"))) = {$/;"	v	typeref:typename:uint32_t[]
+main	main.c	/^int main(void)$/;"	f	typeref:typename:int
+reset_handler	startup.c	/^void reset_handler(void)$/;"	f	typeref:typename:void
+systick_handler	main.c	/^void systick_handler()$/;"	f	typeref:typename:void
+ticks	main.c	/^volatile uint32_t ticks = 0;$/;"	v	typeref:typename:volatile uint32_t
