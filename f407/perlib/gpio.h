@@ -2,6 +2,7 @@
 #define GPIO_H_SENTRY
 
 #include "stm32f4xx.h"
+#include "rcc.h"
 
 typedef enum {
 	gpio_port_a = gpioa_id,

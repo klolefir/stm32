@@ -2,9 +2,8 @@
 #define USART_H_SENTRY
 
 #include "stm32f4xx.h"
-
-#define USART1_GPIO_PORT GPIOA
-#define USART2_GPIO_PORT GPIOB
+#include "gpio.h"
+#include "rcc.h"
 
 enum {
 	usart1_gpio_port = gpio_port_a,
@@ -24,7 +23,7 @@ typedef enum {
 
 typedef enum {
 	usart_rx_off 	= 0,
-	usart_rx_en		= 1
+	usart_rx_on		= 1
 } usart_rx_state_t;
 
 typedef enum {

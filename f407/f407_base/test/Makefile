@@ -6,8 +6,8 @@ CPPFLAGS=-DSTM32F407xx \
 		 -I ../../perlib
 LINKER_FILE=link.ld
 LDFLAGS=-T $(LINKER_FILE) -g
-SOURCES = main.c startup.c ../vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c ../../perlib/gpio.c
-SOURCES += uart.c
+SOURCES = main.c startup.c ../vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c
+SOURCES += ../../perlib/gpio.c ../../perlib/rcc.c ../../perlib/usart.c
 
 all: firmware.elf
 
