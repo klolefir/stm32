@@ -4,6 +4,13 @@
 #include "stm32f4xx.h"
 
 typedef enum {
+	gpio_port_a = gpioa_id,
+	gpio_port_b = gpiob_id,
+	gpio_port_c = gpioc_id,
+	gpio_port_d = gpiod_id
+} gpio_port_t;
+
+typedef enum {
 	gpio_mode_input 	= 0b00,
 	gpio_mode_output 	= 0b01,
 	gpio_mode_alt 		= 0b01,
@@ -46,7 +53,7 @@ typedef enum {
 } gpio_alt_t;
 
 typedef struct {
-	GPIO_TypeDef 	*port;
+	gpio_port_t 	port;
 	uint32_t 		mask;
 	gpio_mode_t 	mode 	: 2;
 	gpio_otype_t 	otype 	: 1;

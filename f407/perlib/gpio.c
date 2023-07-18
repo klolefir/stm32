@@ -2,7 +2,22 @@
 
 void gpio_init(gpio_t *pin)
 {
-	GPIO_TypeDef *port = pin->port;
+	GPIO_TypeDef *port;
+	switch(pin->port) {
+	case gpio_port_a:	port = GPIOA;	
+						break;
+
+	case gpio_port_b:	port = GPIOB;
+						break;
+
+	case gpio_port_c:	port = GPIOC;
+						break;
+
+	case gpio_port_d:	port = GPIOD;
+						break;
+	
+	default:			return;
+	}
 	uint8_t mask = pin->mask;
 
 	port->MODER |= (pin->mode << (mask * 2));
