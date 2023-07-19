@@ -7,13 +7,18 @@
 
 enum {
 	usart1_gpio_port = gpio_port_a,
-	usart2_gpio_port = gpio_port_d,
 	usart1_tx_pin = 9,
 	usart1_rx_pin = 10,
+	usart1_bus_div = rcc_apb2_div,
+	usart1_irq_priority = 0
+};
+
+enum {
+	usart2_gpio_port = gpio_port_d,
 	usart2_tx_pin = 5,
 	usart2_rx_pin = 6,
-	usart1_bus_div = rcc_apb2_div,
-	usart2_bus_div = rcc_apb1_div
+	usart2_bus_div = rcc_apb1_div,
+	usart2_irq_priority = 0
 };
 
 typedef enum {
@@ -56,7 +61,7 @@ void usart_put_char(usart_t *usart_st, const char c);
 void usart_put_str(usart_t *usart_st, const char *str);
 void usart_put_buff(usart_t *usart_st, const char *buff, const uint32_t len);
 void usart_get_char(usart_t *usart_st, char *c);
-//void usart_get_str(usart_t *usart_st, char *str, char term = '\r');
+//void usart_get_str(usart_t *usart_st, char *str, char term);
 
 void usart_enable(usart_t *usart_st);
 void usart_disable(usart_t *usart_st);

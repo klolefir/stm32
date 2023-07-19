@@ -1,4 +1,5 @@
 #include "usart.h"
+#include "nvic.h"
 #include "gpio.h"
 #include "rcc.h"
 
@@ -47,19 +48,34 @@ void usart_init(usart_t *usart_st)
 
 	uint8_t rcc_bus_div = usart1_bus_div;
 	USART_TypeDef *usart = usart_st->usart;
+	usart_tx_state_t tx_st = usart_st->tx_st;
+	usart_rx_state_t rx_st = usart_st->rx_st;
+	usart_tx_int_state_t tx_int_st = usart_st->tx_int_st;
+	usart_rx_int_state_t rx_int_st = usart_st->rx_int_st;
+
 	if(usart == USART1) {
 		rcc_enable(usart1_id);
+		if((tx_int_st == usart_tx_int_on) || (rx_int_st == usart_rx_int_on)) {
+			nvic_enable_irq(usart1_irqn);
+			nvic_set_priority(usart1_irqn, usart1_irq_priority);
+		}
 		rcc_bus_div = usart1_bus_div;
 	}
 	else if(usart == USART2) {
+		if((tx_int_st == usart_tx_int_on) || (rx_int_st == usart_rx_int_on)) {
+			nvic_enable_irq(usart2_irqn);
+			nvic_set_priority(usart2_irqn, usart2_irq_priority);
+		}
 		rcc_enable(usart2_id);
 		rcc_bus_div = usart2_bus_div;
 	}
 
-	usart->CR1 |= (usart_st->tx_st << USART_CR1_TE_Pos);
-	usart->CR1 |= (usart_st->rx_st << USART_CR1_RE_Pos);
-	usart->CR1 |= (usart_st->tx_int_st << USART_CR1_TXEIE_Pos);
-	usart->CR1 |= (usart_st->rx_int_st << USART_CR1_RXNEIE_Pos);
+
+
+	usart->CR1 |= (tx_st << USART_CR1_TE_Pos);
+	usart->CR1 |= (rx_st << USART_CR1_RE_Pos);
+	usart->CR1 |= (tx_int_st << USART_CR1_TXEIE_Pos);
+	usart->CR1 |= (rx_int_st << USART_CR1_RXNEIE_Pos);
 
 	usart->BRR = (SystemCoreClock / rcc_bus_div) / (usart_st->baud);
 	usart->CR1 |= USART_CR1_UE;

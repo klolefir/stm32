@@ -14,8 +14,8 @@ typedef enum {
 typedef enum {
 	gpio_mode_input 	= 0b00,
 	gpio_mode_output 	= 0b01,
-	gpio_mode_alt 		= 0b01,
-	gpio_mode_analog 	= 0b01
+	gpio_mode_alt 		= 0b10,
+	gpio_mode_analog 	= 0b11
 } gpio_mode_t;
 
 typedef enum {
@@ -27,7 +27,7 @@ typedef enum {
 	gpio_ospeed_low = 0b00,
 	gpio_ospeed_medium = 0b01,
 	gpio_ospeed_high = 0b10,
-	gpio_ospeed_vhigh = 0x11
+	gpio_ospeed_vhigh = 0b11
 } gpio_ospeed_t;
 
 typedef enum {
