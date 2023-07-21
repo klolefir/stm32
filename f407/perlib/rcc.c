@@ -1,5 +1,7 @@
 #include "rcc.h"
 
+static uint32_t apb1_clk, apb2_clk, ahb1_clk, system_clk;
+
 static void rcc_deinit()
 {
 	SET_BIT(RCC->CR, RCC_CR_HSION);
@@ -80,17 +82,22 @@ void rcc_enable(const periph_id_t periph_id)
 	}
 }
 
+uint32_t rcc_get_system_clk()
+{
+	return system_clk;
+}
+
 uint32_t rcc_get_ahb1_clk()
 {
-	return SystemCoreClock;
+	return system_clk / ahb1_div;
 }
 
 uint32_t rcc_get_apb1_clk()
 {
-	return (SystemCoreClock / rcc_apb1_div);
+	return system_clk / apb1_div;
 }
 
 uint32_t rcc_get_apb2_clk()
 {
-	return (SystemCoreClock / rcc_apb2_div);
+	return system_clk / apb2_div;
 }
