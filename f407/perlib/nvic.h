@@ -3,6 +3,8 @@
 
 #include "stm32f4xx.h"
 
+typedef int8_t nvic_irq_prior_t ; 
+
 typedef enum {
 	exti0_irqn  = EXTI0_IRQn,
 	exti1_irqn	= EXTI1_IRQn,
@@ -12,12 +14,14 @@ typedef enum {
 	adc_irqn	= ADC_IRQn,
 	tim2_irqn 	= TIM2_IRQn,
 	tim3_irqn 	= TIM3_IRQn,
+	tim6_irqn 	= TIM6_DAC_IRQn,
+	tim7_irqn 	= TIM7_IRQn,
 	usart1_irqn = USART1_IRQn,
 	usart2_irqn = USART2_IRQn
-} irqn_t;
+} nvic_irqn_t;
 
-void nvic_enable_irq(irqn_t irqn);
-void nvic_disable_irq(irqn_t irqn);
-void nvic_set_priority(irqn_t irqn, int8_t priority);
+void nvic_enable_irq(nvic_irqn_t irqn);
+void nvic_disable_irq(nvic_irqn_t irqn);
+void nvic_set_priority(nvic_irqn_t irqn, nvic_irq_prior_t priority);
 
 #endif 

@@ -4,7 +4,7 @@ void gpio_init(gpio_t *pin)
 {
 	GPIO_TypeDef *port;
 	uint8_t mask = pin->mask;
-	periph_id_t gpio_id;
+	rcc_periph_id_t gpio_id;
 
 	switch(pin->port) {
 	case gpio_port_a:	gpio_id = gpioa_id;

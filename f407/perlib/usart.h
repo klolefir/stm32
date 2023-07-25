@@ -55,7 +55,7 @@ typedef struct {
 	usart_tx_int_state_t	tx_int_st	: 1;
 } usart_t;
 
-void usart_init(usart_t *usart);
+void usart_init(usart_t *usart_st);
 
 void usart_put_char(usart_t *usart_st, const char c);
 void usart_put_str(usart_t *usart_st, const char *str);

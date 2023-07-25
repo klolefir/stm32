@@ -45,10 +45,16 @@ typedef enum {
 	spi1_id,
 	spi2_id,
 	tim1_id,
-	tim2_id
-} periph_id_t;
+	tim2_id,
+	tim6_id,
+	tim7_id
+} rcc_periph_id_t;
 
 void rcc_init();
-void rcc_enable(periph_id_t periph_id);
+void rcc_enable(const rcc_periph_id_t periph_id);
+uint32_t rcc_get_system_clk();
+uint32_t rcc_get_ahb1_clk();
+uint32_t rcc_get_apb1_clk();
+uint32_t rcc_get_apb2_clk();
 
 #endif

@@ -1,6 +1,6 @@
 #include "rcc.h"
 
-static uint32_t apb1_clk, apb2_clk, ahb1_clk, system_clk;
+static uint32_t system_clk;
 
 static void rcc_deinit()
 {
@@ -52,9 +52,10 @@ void rcc_init()
 	while(!(RCC->CFGR & RCC_CFGR_SWS_PLL)) {}
 
 	SystemCoreClockUpdate();
+	system_clk = SystemCoreClock;
 }
 
-void rcc_enable(const periph_id_t periph_id)
+void rcc_enable(const rcc_periph_id_t periph_id)
 {
 	switch(periph_id) {
 	case gpioa_id:	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
@@ -75,6 +76,12 @@ void rcc_enable(const periph_id_t periph_id)
 	case tim1_id:	RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;	
 					break;
 
+	case tim6_id:	RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;	
+					break;
+
+	case tim7_id:	RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;	
+					break;
+
 	case spi1_id:	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;	
 					break;
 
@@ -89,15 +96,15 @@ uint32_t rcc_get_system_clk()
 
 uint32_t rcc_get_ahb1_clk()
 {
-	return system_clk / ahb1_div;
+	return system_clk / rcc_ahb1_div;
 }
 
 uint32_t rcc_get_apb1_clk()
 {
-	return system_clk / apb1_div;
+	return system_clk / rcc_apb1_div;
 }
 
 uint32_t rcc_get_apb2_clk()
 {
-	return system_clk / apb2_div;
+	return system_clk / rcc_apb2_div;
 }
