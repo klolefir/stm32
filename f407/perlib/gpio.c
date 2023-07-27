@@ -1,5 +1,22 @@
 #include "gpio.h"
 
+static GPIO_TypeDef *switch_port(gpio_t *gpio)
+{
+	gpio_port_t port = gpio->port;
+
+	switch(port) {
+	case gpio_port_a:	return GPIOA;	
+
+	case gpio_port_b:	return GPIOB;
+
+	case gpio_port_c:	return GPIOC;
+
+	case gpio_port_d:	return GPIOD;
+	
+	default:			return 0;
+	}
+}
+
 void gpio_init(gpio_t *pin)
 {
 	GPIO_TypeDef *port;
@@ -41,17 +58,32 @@ void gpio_init(gpio_t *pin)
 		port->AFR[1] |= (pin->alt << ((mask - 8) * 4));
 }
 
-void gpio_setout(gpio_t *pin)
+void gpio_set(gpio_t *pin)
 {
+	GPIO_TypeDef *gpio = switch_port(pin);
+	uint8_t mask = pin->mask;
+	gpio_mode_t mode = pin->mode;
 
+	if(mode == gpio_mode_output)
+		gpio->BSRR |= (1 << mask);
 }
 
-void gpio_clrout(gpio_t *pin)
+void gpio_clr(gpio_t *pin)
 {
+	GPIO_TypeDef *gpio = switch_port(pin);
+	uint8_t mask = pin->mask;
+	gpio_mode_t mode = pin->mode;
 
+	if(mode == gpio_mode_output)
+		gpio->BSRR |= (1 << (mask * 2));
 }
 
-void gpio_tglout(gpio_t *pin)
+void gpio_tgl(gpio_t *pin)
 {
+	GPIO_TypeDef *gpio = switch_port(pin);
+	uint8_t mask = pin->mask;
+	gpio_mode_t mode = pin->mode;
 
+	if(mode == gpio_mode_output)
+		gpio->ODR ^= (1 << mask);
 }

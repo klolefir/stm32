@@ -55,7 +55,7 @@ typedef enum {
 
 typedef struct {
 	gpio_port_t 	port;
-	uint32_t 		mask;
+	uint8_t 		mask;
 	gpio_mode_t 	mode 	: 2;
 	gpio_otype_t 	otype 	: 1;
 	gpio_ospeed_t 	ospeed 	: 2;
@@ -64,8 +64,8 @@ typedef struct {
 } gpio_t;
 
 void gpio_init(gpio_t *pin);
-void gpio_setout(gpio_t *pin);
-void gpio_clrout(gpio_t *pin);
-void gpio_tglout(gpio_t *pin);
+void gpio_set(gpio_t *pin);
+void gpio_clr(gpio_t *pin);
+void gpio_tgl(gpio_t *pin);
 
 #endif
