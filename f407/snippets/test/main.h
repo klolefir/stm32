@@ -9,6 +9,7 @@
 #include "nvic.h"
 #include "systick.h"
 #include "tim.h"
+#include "flash.h"
 
 #define VECTOR_TAB_SRAM
 #define LED1_PIN 6

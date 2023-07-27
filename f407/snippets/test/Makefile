@@ -3,11 +3,11 @@ CFLAGS = -mcpu=cortex-m4 -mthumb -Wall -g -O0
 CPPFLAGS = -DSTM32F407xx \
 		   -I ../../vendor/CMSIS/Device/ST/STM32F4/Include \
 		   -I ../../vendor/CMSIS/CMSIS/Core/Include \
-		   -I ../../../perlib
+		   -I ../../perlib
 LINKER_FILE = ../general/link.ld
 LDFLAGS = -T $(LINKER_FILE) -Wall -g -nostdlib
 SOURCES = main.c ../general/startup.c ../../vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c
-SOURCES += ../../../perlib/*
+SOURCES += ../../perlib/*
 
 all: firmware.elf
 
