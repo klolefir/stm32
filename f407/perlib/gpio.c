@@ -1,21 +1,6 @@
 #include "gpio.h"
 
-static GPIO_TypeDef *switch_port(gpio_t *gpio)
-{
-	gpio_port_t port = gpio->port;
-
-	switch(port) {
-	case gpio_port_a:	return GPIOA;	
-
-	case gpio_port_b:	return GPIOB;
-
-	case gpio_port_c:	return GPIOC;
-
-	case gpio_port_d:	return GPIOD;
-	
-	default:			return 0;
-	}
-}
+static GPIO_TypeDef *switch_port(gpio_t *gpio);
 
 void gpio_init(gpio_t *pin)
 {
@@ -87,3 +72,21 @@ void gpio_tgl(gpio_t *pin)
 	if(mode == gpio_mode_output)
 		gpio->ODR ^= (1 << mask);
 }
+
+GPIO_TypeDef *switch_port(gpio_t *gpio)
+{
+	gpio_port_t port = gpio->port;
+
+	switch(port) {
+	case gpio_port_a:	return GPIOA;	
+
+	case gpio_port_b:	return GPIOB;
+
+	case gpio_port_c:	return GPIOC;
+
+	case gpio_port_d:	return GPIOD;
+	
+	default:			return 0;
+	}
+}
+

@@ -3,17 +3,10 @@
 
 void delay_ms(uint32_t ms);
 void receive_data();
+void usart_put_uint32(uint32_t data);
 
-const uint32_t page_addr = flash_sector8_addr;
+const uint32_t page_addr = flash_sector9_addr + 0x100;
 const uint32_t write_data = 0xDEADBEEF;
-
-void flash_enable_irq()
-{
-	flash_unlock();
-	set_bit(&FLASH->CR, FLASH_CR_ERRIE);
-	set_bit(&FLASH->CR, FLASH_CR_EOPIE);
-	flash_lock();
-}
 
 void flash_put_status(flash_status_t status)
 {
@@ -30,36 +23,32 @@ void flash_put_status(flash_status_t status)
 
 void flash_write_test()
 {
-	flash_unlock();
-	char data_str[5];
-	memcpy(data_str, &write_data, sizeof(uint32_t));
-	data_str[4] = '\0';
-	flash_status_t status = flash_write(page_addr, write_data);
-	usart_put_str(&usart1, "Write data: ");
-	usart_put_str(&usart1, data_str);
-	usart_put_char(&usart1, '\r');
+	flash_status_t status;
+
+	status = flash_write(page_addr, write_data);
+
+	usart_put_uint32(write_data);
 	flash_put_status(status);
-	flash_lock();
 }
 
 void flash_read_test()
 {
 	uint32_t read_data;
-	char data_str[5];
-	flash_unlock();
-	flash_status_t status = flash_read(page_addr, &read_data);
-	memcpy(data_str, &read_data, sizeof(uint32_t));
-	data_str[4] = '\0';
+	flash_status_t status;
+
+	status = flash_read(page_addr, &read_data);
+
+	usart_put_uint32(read_data);
 	flash_put_status(status);
-	flash_lock();
+}
 
-	if(read_data == write_data)
-		usart_put_str(&usart1, "Ok data: ");
-	else
-		usart_put_str(&usart1, "Bad data: ");
-
+void usart_put_uint32(uint32_t data)
+{
+	char data_str[6];
+	memcpy(data_str, &data, sizeof(uint32_t));
+	data_str[4] = '\r';
+	data_str[5] = '\0';
 	usart_put_str(&usart1, data_str);
-	usart_put_char(&usart1, '\r');
 }
 
 int main(void)
@@ -72,12 +61,6 @@ int main(void)
 	usart_init(&usart1);
 	//tim_init(&tim6);
 	
-	NVIC_EnableIRQ(FLASH_IRQn);
-	NVIC_SetPriority(FLASH_IRQn, 0);
-	//NVIC_EnableIRQ(6);
-	//NVIC_SetPriority(6, 0);
-
-	flash_enable_irq();
 	flash_write_test();
 	flash_read_test();
 	while(1) {

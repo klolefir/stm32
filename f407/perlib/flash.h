@@ -57,9 +57,10 @@ enum {
 	large_sector_size		= flash_sector6_addr - flash_sector5_addr
 };
 
-void flash_unlock();
-void flash_lock();
+//void flash_unlock();
+//void flash_lock();
 flash_status_t flash_write(uint32_t page_addr, const uint32_t data);
 flash_status_t flash_read(uint32_t page_addr, uint32_t *data);
+//flash_status_t flash_erase(uint32_t page_addr);
 
 #endif

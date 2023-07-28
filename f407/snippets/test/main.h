@@ -39,6 +39,7 @@ static gpio_t led1_pin = {
 	.alt = gpio_alt_system
 };
 
+#if 0
 static tim_t tim6 = {
 	.tim_num 	= tim_6,
 	.psc 		= 21000,
@@ -46,6 +47,7 @@ static tim_t tim6 = {
 	.irq_st 	= tim_irq_on,
 	.pwr_st 	= tim_pwr_on
 };
+#endif
 
 void enable_irq()
 {
