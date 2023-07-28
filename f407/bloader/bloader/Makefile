@@ -4,14 +4,10 @@ CPPFLAGS = -DSTM32F407xx \
 		   -I ../../vendor/CMSIS/Device/ST/STM32F4/Include \
 		   -I ../../vendor/CMSIS/CMSIS/Core/Include \
 		   -I ../../perlib
-LINKER_FILE = ../general/link.ld
+LINKER_FILE = ../general/link_bloader.ld
 LDFLAGS = -T $(LINKER_FILE) -Wall -g -nostdlib
 SOURCES = main.c ../general/startup.c ../../vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c
-SOURCES += 	../../perlib/systick.c	\
-			../../perlib/gpio.c		\
-			../../perlib/nvic.c		\
-			../../perlib/rcc.c		\
-			../../perlib/general.c
+SOURCES += ../../perlib/*
 
 all: firmware.elf
 
@@ -25,7 +21,7 @@ flash: firmware.bin
 	st-flash --reset write $< 0x8000000
 
 dfu: firmware.bin
-	dfu-util -a 0 -s 0x08000000:leave -D $<
+	dfu-util -a 0 -s 0x08000000 -D $<
 
 clean:
 	rm firmware.*

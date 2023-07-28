@@ -2,7 +2,7 @@
 
 static uint32_t system_clk;
 
-static void rcc_deinit()
+void rcc_deinit()
 {
 	SET_BIT(RCC->CR, RCC_CR_HSION);
 	while(READ_BIT(RCC->CR, RCC_CR_HSIRDY) == RESET) {}

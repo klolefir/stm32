@@ -18,13 +18,18 @@ static volatile uint32_t ticks = 0;
 static volatile uint32_t usart_ticks = 0;
 
 enum {
-	main_addr = flash_sector2_addr
-}
+	main_addr = 0x08008000
+};
 
 enum {
 	req_buff_len = 1024,
 	ans_buff_len = 1024
 };
+
+typedef enum {
+	app_flag_up,
+	app_flag_down
+} app_flag_t;
 
 typedef struct {
 	char buff[req_buff_len];

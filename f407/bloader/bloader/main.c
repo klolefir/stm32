@@ -1,9 +1,11 @@
 #include "main.h"
 
+void run_main();
 void system_init();
+void system_deinit();
 void delay_ms(uint32_t ms);
-void receive_data(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st);
-void decode_answer(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st);
+app_flag_t receive_data(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st);
+app_flag_t decode_answer(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st);
 void usart_put_uint32(uint32_t data);
 
 int main(void)
@@ -18,10 +20,8 @@ int main(void)
 	app_flag_t app_flag;
 	while(1) {
 		app_flag = receive_data(&req_buff_st, &ans_buff_st);
-		switch(app_flag) {
-		case app_flag_up:
+		if(app_flag == app_flag_up)
 			run_main();
-		}
 	}
 }
 
@@ -30,10 +30,19 @@ void run_main()
 	typedef void(*main_f)(void);
 	main_f main_jump;
 
+	rcc_deinit();
+	system_deinit();
+
 	__disable_irq();
-	uint32_t main_jump_addr = *(uint32_t *)(main_addr + 0x04);
+//	__DSB();
+//	__ISB();
+	SCB->VTOR = main_addr;
+
+	uint32_t msp = *((volatile uint32_t *)(main_addr));
+	__set_MSP(msp);
+
+	uint32_t main_jump_addr = *((uint32_t *)(main_addr + 4));
 	main_jump = (main_f)main_jump_addr;
-	__set_MSP(*(__IO uint32_t *)main_addr);
 	main_jump();
 }
 
@@ -48,7 +57,17 @@ void system_init()
 	tim_init(&tim6);
 }
 
-void receive_data(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st)
+void system_deinit()
+{
+	RCC->AHB1ENR = 0;
+	RCC->APB1ENR = 0;
+	RCC->APB2ENR = 0;
+	SysTick->CTRL = 0;
+	SysTick->LOAD = 0;
+	SysTick->VAL = 0;
+}
+
+app_flag_t receive_data(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st)
 {
 	uint32_t *req_cnt = &(req_buff_st->cnt);
 	char *req_buff = (req_buff_st->buff);
@@ -63,9 +82,10 @@ void receive_data(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st)
 		timer = usart_ticks + 2;
 	}
 
+	app_flag_t app_flag = app_flag_down; 
 	if(((timer) && (usart_ticks >= timer)) || (*req_cnt >= req_buff_len)) {
 		if(*req_cnt) {
-			app_flag_t app_flag = decode_answer(req_buff_st, ans_buff_st);
+			app_flag = decode_answer(req_buff_st, ans_buff_st);
 			if(*ans_cnt)
 				usart_put_buff(&usart1, ans_buff, *ans_cnt);
 			timer = 0;
@@ -78,19 +98,33 @@ void receive_data(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st)
 app_flag_t decode_answer(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st)
 {
 	app_flag_t app_flag = app_flag_down;
-	const char ans_str[] = "Working...\r";
+	const char go_main_str[] = "Go main...\r";
+	const char info_str[] = "I'm  bloader!\r";
+	const char no_savvy_str[] = "No savvy @_@\r";
 
-	uint32_t *req_cnt = &(req_buff_st->cnt);
+	//uint32_t *req_cnt = &(req_buff_st->cnt);
 	char *req_buff = (req_buff_st->buff);
 	uint32_t *ans_cnt = &(ans_buff_st->cnt);
 	char *ans_buff = (ans_buff_st->buff);
 
-	if(req_buff[0] == 'B')
-		app_flag = app_flag_up;
+	*ans_cnt = 0;
 
-	*ans_cnt = sizeof(ans_str) - 1;
-	//memcpy(ans_buff, ans_str, sizeof(ans_str));
-	memcpy(ans_buff, ans_str, sizeof(ans_str));
+	char command = req_buff[0];
+	switch(command) {
+	case 'B': 	app_flag = app_flag_up;
+				*ans_cnt = sizeof(go_main_str) - 1;
+				memcpy(ans_buff, go_main_str, sizeof(go_main_str));
+				break;
+
+	case 'I':	*ans_cnt = sizeof(info_str) - 1;
+				memcpy(ans_buff, info_str, sizeof(info_str));
+				break;
+
+	default:	*ans_cnt = sizeof(no_savvy_str) - 1;
+				memcpy(ans_buff, no_savvy_str, sizeof(no_savvy_str));
+				break;
+	}
+
 	return app_flag;
 }
 

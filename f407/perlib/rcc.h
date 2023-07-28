@@ -51,6 +51,7 @@ typedef enum {
 } rcc_periph_id_t;
 
 void rcc_init();
+void rcc_deinit();
 void rcc_enable(const rcc_periph_id_t periph_id);
 uint32_t rcc_get_system_clk();
 uint32_t rcc_get_ahb1_clk();
