@@ -1,9 +1,9 @@
 CC = arm-none-eabi-gcc
-CFLAGS = -mcpu=cortex-m4 -mthumb -Wall -g -O0
+CFLAGS = -mcpu=cortex-m4 -mthumb -Wall -g -O0 
 CPPFLAGS = -DSTM32F407xx \
 		   -I ../../vendor/CMSIS/Device/ST/STM32F4/Include \
-		   -I ../../vendor/CMSIS/CMSIS/Core/Include \
-		   -I ../../perlib
+		   -I ../../perlib \
+		   -I ../../vendor/CMSIS/CMSIS/Core/Include/
 LINKER_FILE = ../general/link_main.ld
 LDFLAGS = -T $(LINKER_FILE) -Wall -g -nostdlib
 SOURCES = main.c ../general/startup.c ../../vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c
@@ -11,6 +11,8 @@ SOURCES += 	../../perlib/systick.c	\
 			../../perlib/gpio.c		\
 			../../perlib/nvic.c		\
 			../../perlib/rcc.c		\
+			../../perlib/usart.c	\
+			../../perlib/tim.c		\
 			../../perlib/general.c
 
 all: firmware.elf

@@ -58,6 +58,9 @@ typedef struct {
 void usart_init(usart_t *usart_st);
 
 void usart_put_char(usart_t *usart_st, const char c);
+#if 0
+void usart_put_uint32(usart_t *usart_st, const uint32_t data);
+#endif
 void usart_put_str(usart_t *usart_st, const char *str);
 void usart_put_buff(usart_t *usart_st, const char *buff, const uint32_t len);
 void usart_get_char(usart_t *usart_st, char *c);
