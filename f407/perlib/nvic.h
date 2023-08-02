@@ -6,6 +6,7 @@
 typedef int8_t nvic_irq_prior_t ; 
 
 typedef enum {
+	none_irqn  	= 0,
 	exti0_irqn  = EXTI0_IRQn,
 	exti1_irqn	= EXTI1_IRQn,
 	exti2_irqn	= EXTI2_IRQn,

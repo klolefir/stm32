@@ -12,7 +12,7 @@
 
 void enable_irq();
 
-volatile uint32_t usart_ticks = 0;
+//volatile uint32_t usart_ticks = 0;
 
 typedef enum {
 	idle_state,
@@ -69,7 +69,7 @@ static usart_t usart1 = {
 	.rx_int_st = usart_rx_int_off
 };
 
-static tim_t tim6 = {
+static tim_t usart_tim = {
 	.tim_num 	= tim_6,
 	.psc 		= 21000,
 	.arr 		= 100,

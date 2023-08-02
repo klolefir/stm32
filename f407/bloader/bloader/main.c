@@ -3,7 +3,6 @@
 void run_main();
 void system_init();
 void system_deinit();
-void delay_ms(uint32_t ms);
 app_flag_t receive_data(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st);
 app_flag_t decode_answer(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st);
 void usart_put_uint32(uint32_t data);
@@ -136,26 +135,6 @@ void usart_put_uint32(uint32_t data)
 	data_str[5] = '\0';
 	usart_put_str(&usart1, data_str);
 }
-
-#if 1
-void delay_ms(uint32_t ms)
-{
-	uint32_t start = ticks;
-	uint32_t end = start + ms;
-
-	if(end < start)
-		while(ticks > start) {}
-
-	while(ticks < end) {}
-}
-#endif
-
-#if 1
-void systick_handler()
-{
-	ticks++;
-}
-#endif
 
 void tim6_dac_handler()
 {

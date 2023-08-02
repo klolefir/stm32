@@ -42,5 +42,7 @@ void tim_enable(tim_t *tim_setup);
 void tim_disable(tim_t *tim_setup);
 void tim_enable_irq(tim_t *tim_setup);
 void tim_disable_irq(tim_t *tim_setup);
+uint32_t tim_get_ticks(tim_t *tim_setup);
+void tim_set_ticks(tim_t *tim_setup, const uint32_t ticks);
 
 #endif

@@ -13,6 +13,7 @@ SOURCES += 	../../perlib/systick.c	\
 			../../perlib/rcc.c		\
 			../../perlib/usart.c	\
 			../../perlib/tim.c		\
+			../../perlib/tim_hd.c	\
 			../../perlib/general.c
 
 all: firmware.elf

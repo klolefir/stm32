@@ -19,7 +19,7 @@ int main(void)
 	gpio_init(&led1_pin);
 	systick_init(1000);
 	usart_init(&usart1);
-	tim_init(&tim6);
+	tim_init(&usart_tim);
 
 	process();
 	while(1) {
@@ -116,10 +116,12 @@ recv_st_t receive(req_buff_t *req_buff_st)
 	char *req_buff = (req_buff_st->buff);
 
 	static uint32_t timer = 0;
+	uint32_t usart_ticks;
 
 	if((USART1->SR & USART_SR_RXNE)) {
 		req_buff[*req_cnt] = USART1->DR;
 		(*req_cnt)++;
+		usart_ticks = tim_get_ticks(&usart_tim);
 		timer = usart_ticks + 2;
 	}
 
@@ -198,15 +200,6 @@ void purge(req_buff_t *req_buff_st)
 {
 	uint32_t *req_cnt = &(req_buff_st->cnt);
 	*req_cnt = 0;
-}
-
-void tim6_dac_handler()
-{
-	uint8_t is_tim6 = read_bit(&TIM6->SR, TIM_SR_UIF);
-	if(is_tim6) {
-		clear_bit(&TIM6->SR, TIM_SR_UIF);
-		usart_ticks++;
-	}
 }
 
 #if 0
