@@ -1,12 +1,6 @@
 #include "main.h"
 
 recv_st_t receive(req_buff_t *req_buff_st);
-void decode(const req_buff_t *req_buff_st, dec_buff_t *dec_buff_st);
-handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st);
-void respond(ans_buff_t *ans_buff_st);
-void purge(req_buff_t *req_buff_st);
-void reset();
-void process();
 
 uint32_t kestrlen(const char *str);
 void kememcpy(void *dst, const void *src, const uint32_t count);
