@@ -183,9 +183,27 @@ void usart_put_buff(usart_t *usart_st, const char *buff, const uint32_t len)
 	}
 }
 
+usart_rx_status_t usart_get_rx_status(usart_t *usart_setup)
+{
+	USART_TypeDef *usart = usart_setup->usart;
+	if((usart->SR & USART_SR_RXNE))
+		return usart_rx_rdy;
+	else
+		return usart_rx_nrdy;
+}
+
+usart_tx_status_t usart_get_tx_status(usart_t *usart_setup)
+{
+	USART_TypeDef *usart = usart_setup->usart;
+	if((usart->SR & USART_SR_TXE))
+		return usart_tx_rdy;
+	else
+		return usart_tx_nrdy;
+}
+
 void usart_get_char(usart_t *usart_st, char *c)
 {
 	USART_TypeDef *usart = usart_st->usart;
-	while(!(usart->SR & USART_SR_RXNE)) {}
+	//if(!(usart->SR & USART_SR_RXNE)) {}
 	*c = usart->DR;
 }

@@ -14,9 +14,6 @@
 
 void enable_irq();
 
-static volatile uint32_t ticks = 0;
-static volatile uint32_t usart_ticks = 0;
-
 enum {
 	main_addr = 0x08008000
 };
@@ -60,15 +57,13 @@ static gpio_t led1_pin = {
 	.alt = gpio_alt_system
 };
 
-#if 1
-static tim_t tim6 = {
+static tim_t usart_tim = {
 	.tim_num 	= tim_6,
 	.psc 		= 21000,
 	.arr 		= 100,
 	.irq_st 	= tim_irq_on,
 	.pwr_st 	= tim_pwr_on
 };
-#endif
 
 void enable_irq()
 {

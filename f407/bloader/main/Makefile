@@ -3,18 +3,23 @@ CFLAGS = -mcpu=cortex-m4 -mthumb -Wall -g -O0
 CPPFLAGS = -DSTM32F407xx \
 		   -I ../../vendor/CMSIS/Device/ST/STM32F4/Include \
 		   -I ../../perlib \
-		   -I ../../vendor/CMSIS/CMSIS/Core/Include/
+		   -I ../../vendor/CMSIS/CMSIS/Core/Include	\
+		   -I ../general 
 LINKER_FILE = ../general/link_main.ld
 LDFLAGS = -T $(LINKER_FILE) -Wall -g -nostdlib
-SOURCES = main.c ../general/startup.c ../../vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c
-SOURCES += 	../../perlib/systick.c	\
-			../../perlib/gpio.c		\
-			../../perlib/nvic.c		\
-			../../perlib/rcc.c		\
-			../../perlib/usart.c	\
-			../../perlib/tim.c		\
-			../../perlib/tim_hd.c	\
-			../../perlib/general.c
+MAIN_SOURCES = main.c fsm.c
+GENERAL_SOURCES =  ../general/startup.c ../general/kestring.c
+STARTUP_SOURCES =  ../../vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c
+PERLIB_SOURCES = 	../../perlib/systick.c	\
+					../../perlib/gpio.c		\
+					../../perlib/nvic.c		\
+					../../perlib/rcc.c		\
+					../../perlib/usart.c	\
+					../../perlib/tim.c		\
+					../../perlib/tim_hd.c	\
+					../../perlib/general.c
+
+SOURCES = $(MAIN_SOURCES) $(GENERAL_SOURCES) $(STARTUP_SOURCES) $(PERLIB_SOURCES)
 
 all: firmware.elf
 

@@ -32,6 +32,16 @@ typedef enum {
 } usart_rx_state_t;
 
 typedef enum {
+	usart_rx_rdy,
+	usart_rx_nrdy
+} usart_rx_status_t;
+
+typedef enum {
+	usart_tx_rdy,
+	usart_tx_nrdy
+} usart_tx_status_t;
+
+typedef enum {
 	usart_tx_off 	= 0,
 	usart_tx_on 	= 1
 } usart_tx_state_t;
@@ -80,5 +90,8 @@ void usart_rx_int_disable(usart_t *usart_st);
 
 void usart_tx_int_enalbe(usart_t *usart_st);
 void usart_tx_int_disable(usart_t *usart_st);
+
+usart_rx_status_t usart_get_rx_status(usart_t *usart_setup);
+usart_tx_status_t usart_get_tx_status(usart_t *usart_setup);
 
 #endif

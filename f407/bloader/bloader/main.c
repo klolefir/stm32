@@ -53,7 +53,7 @@ void system_init()
 
 	gpio_init(&led1_pin);
 	usart_init(&usart1);
-	tim_init(&tim6);
+	tim_init(&usart_tim);
 }
 
 void system_deinit()
@@ -74,10 +74,12 @@ app_flag_t receive_data(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st)
 	char *ans_buff = (ans_buff_st->buff);
 
 	static uint32_t timer = 0;
+	uint32_t usart_ticks;
 
 	if((USART1->SR & USART_SR_RXNE)) {
 		req_buff[*req_cnt] = USART1->DR;
 		(*req_cnt)++;
+		usart_ticks = tim_get_ticks(&usart_tim);
 		timer = usart_ticks + 2;
 	}
 
@@ -134,13 +136,4 @@ void usart_put_uint32(uint32_t data)
 	data_str[4] = '\r';
 	data_str[5] = '\0';
 	usart_put_str(&usart1, data_str);
-}
-
-void tim6_dac_handler()
-{
-	uint8_t is_tim6 = read_bit(&TIM6->SR, TIM_SR_UIF);
-	if(is_tim6) {
-		clear_bit(&TIM6->SR, TIM_SR_UIF);
-		usart_ticks++;
-	}
 }
