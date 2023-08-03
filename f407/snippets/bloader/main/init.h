@@ -33,11 +33,6 @@ gpio_t led1_pin = {
 };
 
 enum {
-	main_addr 	= 0x08008000,
-	main_sector = main_addr
-};
-
-enum {
 	req_buff_len = 1024,
 	dec_buff_len = 1024,
 	ans_buff_len = 1024

@@ -61,6 +61,6 @@ enum {
 //void flash_lock();
 flash_status_t flash_write(uint32_t page_addr, const uint32_t data);
 flash_status_t flash_read(uint32_t page_addr, uint32_t *data);
-//flash_status_t flash_erase(uint32_t page_addr);
+flash_status_t flash_erase(uint32_t page_addr);
 
 #endif

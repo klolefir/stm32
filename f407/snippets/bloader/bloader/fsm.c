@@ -249,8 +249,6 @@ fsm_state_t switch_state_after_handle(const handle_st_t handle_st)
 							break;
 	case handle_st_res:		next_state = respond_state;
 							break;
-
-	case handle_st_bad:
 	default:				next_state = purge_state;
 	}
 	return next_state;

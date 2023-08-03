@@ -1,7 +1,7 @@
 #include "flash.h"
 #include "general.h"
 
-static flash_status_t flash_erase(uint32_t page_addr);
+//static flash_status_t flash_erase(uint32_t page_addr);
 static flash_lock_status_t flash_check_lock();
 static void flash_wait_until_bsy();
 static flash_status_t flash_switch_sector(uint32_t page_addr, uint32_t *mask);
@@ -18,9 +18,11 @@ flash_status_t flash_write(uint32_t page_addr, const uint32_t data)
 
 	flash_unlock();
 
+#if 0
 	flash_status_t status = flash_erase(page_addr);
 	if(status != flash_ok)
 		return status;
+#endif
 
 	flash_wait_until_bsy();
 
@@ -75,8 +77,10 @@ void flash_lock()
 		set_bit(&FLASH->CR, FLASH_CR_LOCK);
 }
 
-static flash_status_t flash_erase(uint32_t page_addr)
+flash_status_t flash_erase(uint32_t page_addr)
 {
+	flash_unlock();
+
 	uint32_t sector_mask;
 	flash_status_t status = flash_switch_sector(page_addr, &sector_mask);
 	if(status != flash_ok)
@@ -90,6 +94,8 @@ static flash_status_t flash_erase(uint32_t page_addr)
 
 	flash_wait_until_bsy();
 	clear_bit(&FLASH->CR, FLASH_CR_SER);
+
+	flash_lock();
 
 	return flash_ok;
 }

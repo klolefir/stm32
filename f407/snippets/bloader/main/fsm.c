@@ -15,11 +15,6 @@ static handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st
 static void respond(const ans_buff_t *ans_buff_st);
 static void purge(req_buff_t *req_buff_st);
 static void reset();
-static void deinit();
-static void gomain();
-
-fsm_state_t switch_state_after_recv(const recv_st_t recv_status);
-fsm_state_t switch_state_after_handle(const handle_st_t handle_status);
 
 void fsm_process()
 {
@@ -50,7 +45,10 @@ void fsm_process()
 								break;
 
 		case receive_state:		recv_st = receive(&req_buff_st);
-								state = switch_state_after_recv(recv_st);
+								if(recv_st == recv_st_ok)
+									state = decode_state;
+								else
+									state = receive_state;
 								break;
 
 		case decode_state:		decode(&req_buff_st, &dec_buff_st);
@@ -58,7 +56,10 @@ void fsm_process()
 								break;
 
 		case handle_state:		handle_st = handle(&dec_buff_st, &ans_buff_st);
-								state = switch_state_after_handle(handle_st);
+								if(handle_st == handle_st_rst)
+									state = reset_state;
+								else
+									state = respond_state;
 								break;
 
 		case respond_state:		respond(&ans_buff_st);
@@ -67,13 +68,6 @@ void fsm_process()
 
 		case purge_state:		purge(&req_buff_st);
 								state = receive_state;
-								break;
-
-		case deinit_state:		deinit();
-								state = gomain_state;
-								break;
-
-		case gomain_state:		gomain();
 								break;
 
 		case reset_state:		reset();
@@ -104,11 +98,11 @@ recv_st_t receive(req_buff_t *req_buff_st)
 	char *req_buff = (req_buff_st->buff);
 
 	static uint32_t timer = 0;
-	uint32_t usart_ticks;// = 0;
-	char c;
+	uint32_t usart_ticks; //= 0;
 
 	usart_rx_status_t rx_status = usart_get_rx_status(&usart1);
 	if(rx_status == usart_rx_rdy) {
+		char c;
 		usart_get_char(&usart1, &c);
 		req_buff[*req_cnt] = c;
 		(*req_cnt)++;
@@ -142,8 +136,7 @@ void decode(const req_buff_t *req_buff_st, dec_buff_t *dec_buff_st)
 handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st)
 {
 	const char reset_str[] = "Reset...\r";
-	const char gomain_str[] = "Gomain...\r";
-	const char info_str[] = "I'm  bloader!\r";
+	const char info_str[] = "I'm  main!\r";
 	const char no_savvy_str[] = "No savvy @_@\r";
 	const char *ans_str;
 
@@ -153,7 +146,7 @@ handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st)
 	uint32_t *ans_cnt = &(ans_buff_st->cnt);
 	char *ans_buff = (ans_buff_st->buff);
 
-	handle_st_t handle_st = handle_st_res;
+	handle_st_t handle_st = handle_st_ok;
 
 	if(!(*dec_cnt))
 		return handle_st_bad;
@@ -162,10 +155,6 @@ handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st)
 	switch(command) {
 	case 'R': 	handle_st = handle_st_rst;	
 				ans_str = reset_str;	
-				break;
-
-	case 'M': 	handle_st = handle_st_main;	
-				ans_str = gomain_str;
 				break;
 
 	case 'I':	ans_str = info_str;	
@@ -193,65 +182,4 @@ void purge(req_buff_t *req_buff_st)
 {
 	uint32_t *req_cnt = &(req_buff_st->cnt);
 	*req_cnt = 0;
-}
-
-#if 1
-void deinit()
-{
-	rcc_deinit();
-	RCC->AHB1ENR = 0;
-	RCC->APB1ENR = 0;
-	RCC->APB2ENR = 0;
-	SysTick->CTRL = 0;
-	SysTick->LOAD = 0;
-	SysTick->VAL = 0;
-}
-
-void gomain()
-{
-	typedef void(*main_f)(void);
-	main_f main_jump;
-
-	__disable_irq();
-//	__DSB();
-//	__ISB();
-	SCB->VTOR = main_addr;
-
-	uint32_t msp = *((volatile uint32_t *)(main_addr));
-	__set_MSP(msp);
-
-	uint32_t main_jump_addr = *((uint32_t *)(main_addr + 4));
-	main_jump = (main_f)main_jump_addr;
-	main_jump();
-}
-#endif
-
-fsm_state_t switch_state_after_recv(const recv_st_t recv_st)
-{
-	fsm_state_t next_state;
-	switch(recv_st) {
-	case recv_st_ok:	next_state = decode_state;
-						break;
-	case recv_st_bad:	next_state = receive_state;
-						break;
-	default:			next_state = purge_state;	
-	}
-	return next_state;
-}
-
-fsm_state_t switch_state_after_handle(const handle_st_t handle_st)
-{
-	fsm_state_t next_state;
-	switch(handle_st) {
-	case handle_st_rst:		next_state = reset_state;
-							break;
-	case handle_st_main:	next_state = deinit_state;
-							break;
-	case handle_st_res:		next_state = respond_state;
-							break;
-
-	case handle_st_bad:
-	default:				next_state = purge_state;
-	}
-	return next_state;
 }
