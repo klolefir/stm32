@@ -5,6 +5,10 @@
 
 typedef int8_t nvic_irq_prior_t ; 
 
+enum {
+	none_irq_prior = 0
+};
+
 typedef enum {
 	none_irqn  	= 0,
 	exti0_irqn  = EXTI0_IRQn,

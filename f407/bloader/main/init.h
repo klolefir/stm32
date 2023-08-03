@@ -22,10 +22,10 @@ tim_t usart_tim = {
 	.pwr_st 	= tim_pwr_on
 };
 
-gpio_t led1_pin = { 
-	.port = gpio_port_a, 
-	.mask = 6, 
-	.mode = gpio_mode_output, 
+gpio_t led1_pin = {
+	.port = gpio_port_a,
+	.mask = 6,
+	.mode = gpio_mode_output,
 	.otype = gpio_otype_pp,
 	.ospeed = gpio_ospeed_low,
 	.pupd = gpio_pupd_pu,

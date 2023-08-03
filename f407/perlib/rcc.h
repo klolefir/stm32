@@ -36,6 +36,7 @@ typedef enum {
 #endif
 
 typedef enum {
+	none_id,
 	gpioa_id,
 	gpiob_id,
 	gpioc_id,

@@ -1,4 +1,5 @@
 #include "tim_hd.h"
+#include "usart.h"
 
 volatile uint32_t tim6_ticks = 0;
 volatile uint32_t tim7_ticks = 0;

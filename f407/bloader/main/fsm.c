@@ -1,11 +1,18 @@
 #include "fsm.h"
 #include "init.h"
+#include "gpio.h"
+#include "rcc.h"
+#include "general.h"
+#include "systick.h"
+#include "usart.h"
+#include "tim.h"
+#include "kestring.h"
 
 static void init();
 static recv_st_t receive(req_buff_t *req_buff_st);
 static void decode(const req_buff_t *req_buff_st, dec_buff_t *dec_buff_st);
 static handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st);
-static void respond(ans_buff_t *ans_buff_st);
+static void respond(const ans_buff_t *ans_buff_st);
 static void purge(req_buff_t *req_buff_st);
 static void reset();
 
@@ -49,14 +56,14 @@ void fsm_process()
 								break;
 
 		case handle_state:		handle_st = handle(&dec_buff_st, &ans_buff_st);
-								state = respond_state;
-								break;
-
-		case respond_state:		respond(&ans_buff_st);
 								if(handle_st == handle_st_rst)
 									state = reset_state;
 								else
-									state = purge_state;
+									state = respond_state;
+								break;
+
+		case respond_state:		respond(&ans_buff_st);
+								state = purge_state;
 								break;
 
 		case purge_state:		purge(&req_buff_st);
@@ -91,7 +98,7 @@ recv_st_t receive(req_buff_t *req_buff_st)
 	char *req_buff = (req_buff_st->buff);
 
 	static uint32_t timer = 0;
-	uint32_t usart_ticks;
+	uint32_t usart_ticks; //= 0;
 
 	usart_rx_status_t rx_status = usart_get_rx_status(&usart1);
 	if(rx_status == usart_rx_rdy) {
@@ -103,7 +110,8 @@ recv_st_t receive(req_buff_t *req_buff_st)
 		timer = usart_ticks + 2;
 	}
 
-	if(((timer) && (usart_ticks >= timer) && (*req_cnt)) || 
+	//usart_ticks = tim_get_ticks(&usart_tim);
+	if(((timer) && (usart_ticks >= timer) && (*req_cnt)) ||
 		(*req_cnt >= req_buff_len))
 	{
 		recv_st = recv_st_ok;
@@ -121,10 +129,7 @@ void decode(const req_buff_t *req_buff_st, dec_buff_t *dec_buff_st)
 	uint32_t *dec_cnt = &(dec_buff_st->cnt);
 	char *dec_buff = (dec_buff_st->buff);
 
-	uint32_t i;
-	for(i = 0; i < *req_cnt; i++)
-		dec_buff[i] = req_buff[i];
-
+	kememcpy(dec_buff, req_buff, *req_cnt);
 	*dec_cnt = *req_cnt;
 }
 
@@ -156,7 +161,6 @@ handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st)
 				break;
 
 	default:	ans_str = no_savvy_str;
-				break;
 	}
 
 	*ans_cnt = kestrlen(ans_str);
@@ -165,10 +169,10 @@ handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st)
 	return handle_st;
 }
 
-void respond(ans_buff_t *ans_buff_st)
+void respond(const ans_buff_t *ans_buff_st)
 {
-	uint32_t *ans_cnt = &(ans_buff_st->cnt);
-	char *ans_buff = (ans_buff_st->buff);
+	const uint32_t *ans_cnt = &(ans_buff_st->cnt);
+	const char *ans_buff = (ans_buff_st->buff);
 	
 	if(*ans_cnt)
 		usart_put_buff(&usart1, ans_buff, *ans_cnt);

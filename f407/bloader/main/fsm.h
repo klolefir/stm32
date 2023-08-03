@@ -1,18 +1,6 @@
 #ifndef FSM_H_SENTRY
 #define FSM_H_SENTRY
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stm32f4xx.h>
-
-#include "gpio.h"
-#include "rcc.h"
-#include "general.h"
-#include "systick.h"
-#include "usart.h"
-#include "tim.h"
-#include "kestring.h"
-
 void fsm_process();
 
 typedef enum {

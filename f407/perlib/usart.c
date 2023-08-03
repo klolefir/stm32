@@ -156,7 +156,7 @@ void usart_put_char(usart_t *usart_st, const char c)
 void usart_put_uint32(usart_t *usart_st, const uint32_t data)
 {
 	char data_str[6];
-	memcpy(data_str, &data, sizeof(uint32_t));
+	kememcpy(data_str, &data, sizeof(uint32_t));
 	data_str[4] = '\r';
 	data_str[5] = '\0';
 	usart_put_str(&usart_st, data_str);

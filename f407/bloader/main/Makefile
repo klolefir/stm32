@@ -1,5 +1,5 @@
 CC = arm-none-eabi-gcc
-CFLAGS = -mcpu=cortex-m4 -mthumb -Wall -g -O0 
+CFLAGS = -mcpu=cortex-m4 -mthumb -Wall -g -O0
 CPPFLAGS = -DSTM32F407xx \
 		   -I ../../vendor/CMSIS/Device/ST/STM32F4/Include \
 		   -I ../../perlib \

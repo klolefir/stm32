@@ -1,9 +1,9 @@
+#include <stm32f4xx.h>
 #include "fsm.h"
 
 int main(void)
 {
 	__enable_irq();
-
 
 	fsm_process();
 	while(1) {
