@@ -1,14 +1,17 @@
 #include "flash.h"
 #include "general.h"
 
-//static flash_status_t flash_erase(uint32_t page_addr);
-static flash_lock_status_t flash_check_lock();
-static void flash_wait_until_bsy();
-static flash_status_t flash_switch_sector(uint32_t page_addr, uint32_t *mask);
+#ifndef ERASEDEBUG
+static flash_status_t flash_erase(const uint32_t sector_addr);
 static void flash_unlock();
 static void flash_lock();
+#endif
+static flash_lock_status_t flash_check_lock();
+static void flash_wait_until_bsy();
+static flash_status_t flash_switch_sector(const uint32_t page_addr, uint32_t *mask);
 
-flash_status_t flash_write(uint32_t page_addr, const uint32_t data)
+
+flash_status_t flash_write(const uint32_t data_addr, const uint32_t data)
 {
 #if 0
 	flash_lock_status_t lock_status = flash_check_lock();
@@ -16,10 +19,11 @@ flash_status_t flash_write(uint32_t page_addr, const uint32_t data)
 		return flash_lock_err;
 #endif
 
+
+#ifndef ERASEDEBUG
 	flash_unlock();
 
-#if 0
-	flash_status_t status = flash_erase(page_addr);
+	flash_status_t status = flash_erase(data_addr);
 	if(status != flash_ok)
 		return status;
 #endif
@@ -28,18 +32,64 @@ flash_status_t flash_write(uint32_t page_addr, const uint32_t data)
 
 	set_bit(&FLASH->CR, FLASH_CR_PSIZE_1);	//word access
 	set_bit(&FLASH->CR, FLASH_CR_PG);		//enable flash programming
-	*(uint32_t *)page_addr = data;
+	*(uint32_t *)data_addr = data;
 
 	flash_wait_until_bsy();
 
 	clear_bit(&FLASH->CR, FLASH_CR_PG);
 
+#ifndef ERASEDEBUG
 	flash_lock();
+#endif
 
 	return flash_ok;
 }
 
-flash_status_t flash_read(uint32_t page_addr, uint32_t *data)
+flash_status_t flash_write_page(const uint32_t page_addr, const uint32_t *data, const uint32_t page_size)
+{
+	//const uint32_t page_addr = flash_sector9_addr;
+	//const uint32_t page_size = 256; /*bytes*/
+	const uint32_t *write_data;
+	const uint32_t data_size = sizeof(uint32_t);
+	uint32_t addr;
+	flash_status_t status;
+	int i;
+
+	/********************write***********************/
+	for(i = 0; i < (page_size / data_size); i++) {
+		write_data = &data[i];
+		addr = page_addr + (i * flash_addr_offset);
+		status = flash_write(addr, *write_data);
+		if(status != flash_ok)
+			break;
+	}
+	/********************write***********************/
+
+	return status;
+}
+
+flash_status_t flash_read_page(const uint32_t page_addr, uint32_t *data, const uint32_t page_size)
+{
+	uint32_t *read_data;
+	const uint32_t data_size = sizeof(uint32_t);
+	uint32_t addr;
+
+	flash_status_t status;
+	int i;
+	/********************read************************/
+	for(i = 0; i < (page_size / data_size); i++) {
+		read_data = &data[i];
+		addr = page_addr + (i * flash_addr_offset);
+		status = flash_read(addr, read_data);
+		if(status != flash_ok)
+			break;;
+	}
+	/********************read************************/
+
+	return status;
+}
+
+flash_status_t flash_read(const uint32_t data_addr, uint32_t *data)
 {
 #if 0
 	flash_lock_status_t lock_status = flash_check_lock();
@@ -50,7 +100,7 @@ flash_status_t flash_read(uint32_t page_addr, uint32_t *data)
 
 	flash_wait_until_bsy();
 
-	*data = *(uint32_t *)page_addr;
+	*data = *(uint32_t *)data_addr;
 
 	flash_lock();
 
@@ -77,12 +127,14 @@ void flash_lock()
 		set_bit(&FLASH->CR, FLASH_CR_LOCK);
 }
 
-flash_status_t flash_erase(uint32_t page_addr)
+flash_status_t flash_erase(const uint32_t sector_addr)
 {
+#ifndef ERASEDEBUG 
 	flash_unlock();
+#endif
 
 	uint32_t sector_mask;
-	flash_status_t status = flash_switch_sector(page_addr, &sector_mask);
+	flash_status_t status = flash_switch_sector(sector_addr, &sector_mask);
 	if(status != flash_ok)
 		return status;
 
@@ -95,7 +147,9 @@ flash_status_t flash_erase(uint32_t page_addr)
 	flash_wait_until_bsy();
 	clear_bit(&FLASH->CR, FLASH_CR_SER);
 
+#ifndef ERASEDEBUG 
 	flash_lock();
+#endif
 
 	return flash_ok;
 }
@@ -108,7 +162,7 @@ void flash_wait_until_bsy()
 	} while(is_bsy);
 }
 
-flash_status_t flash_switch_sector(uint32_t page_addr, uint32_t *mask)
+flash_status_t flash_switch_sector(const uint32_t page_addr, uint32_t *mask)
 {
 	if((page_addr >= flash_sector0_addr) && (page_addr < flash_sector1_addr)) 
 		*mask = 0;

@@ -174,14 +174,28 @@ void usart_put_str(usart_t *usart_st, const char *str)
 	}
 }
 
-void usart_put_buff(usart_t *usart_st, const char *buff, const uint32_t len)
+void usart_put_buff(usart_t *usart_st, const void *buff, const uint32_t byte_num)
 {
 	USART_TypeDef *usart = usart_st->usart;
+	uint8_t *buff_ptr = (uint8_t *)buff;
+	for(uint32_t i = 0; i < byte_num; i++) {
+		while(!(usart->SR & USART_SR_TXE)) {}
+		usart->DR = *buff_ptr;
+		buff_ptr++;
+	}
+}
+
+#if 0
+void usart_put_buff(usart_t *usart_st, const void *buff, const uint32_t len)
+{
+	USART_TypeDef *usart = usart_st->usart;
+	uint8_t *buff_ptr = (uint8_t *)buff;
 	for(uint32_t i = 0; i < len; i++) {
 		while(!(usart->SR & USART_SR_TXE)) {}
 		usart->DR = buff[i];
 	}
 }
+#endif
 
 usart_rx_status_t usart_get_rx_status(usart_t *usart_setup)
 {

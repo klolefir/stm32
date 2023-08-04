@@ -1,6 +1,9 @@
 #ifndef BLOADER_H_SENTRY
 #define BLOADER_H_SENTRY
 
+#include "init.h"
+#include "fsm.h"
+
 enum {
 	bl_page_size = 256 //bytes
 };
@@ -20,10 +23,16 @@ enum {
 #endif
 
 enum {
-	bl_write_cmd,
-	bl_read_cmd,
-	bl_reset_cmd,
-	bl_erase_cmd
-};
+	bl_test_cmd = 'T',
+	bl_lock_cmd = 'L',
+	bl_unlock_cmd = 'U',
+	bl_write_cmd = 'W',
+	bl_read_cmd = 'R',
+	bl_main_cmd = 'M',
+	//bl_reset_cmd = ',
+	bl_erase_cmd = 'E'
+} bl_cmd_t;
+
+handle_st_t bloader_handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st);
 
 #endif

@@ -6,6 +6,7 @@
 #include "systick.h"
 #include "usart.h"
 #include "tim.h"
+#include "bloader.h"
 #include "kestring.h"
 
 static void init();
@@ -13,7 +14,7 @@ static recv_st_t receive(req_buff_t *req_buff_st);
 static void decode(const req_buff_t *req_buff_st, dec_buff_t *dec_buff_st);
 static handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st);
 static void respond(const ans_buff_t *ans_buff_st);
-static void purge(req_buff_t *req_buff_st);
+static void purge(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st);
 static void reset();
 static void deinit();
 static void gomain();
@@ -21,8 +22,15 @@ static void gomain();
 fsm_state_t switch_state_after_recv(const recv_st_t recv_status);
 fsm_state_t switch_state_after_handle(const handle_st_t handle_status);
 
+req_buff_t req_buff_st;
+
+dec_buff_t dec_buff_st;
+
+ans_buff_t ans_buff_st;
+
 void fsm_process()
 {
+#if 0
 	req_buff_t req_buff_st;
 	req_buff_st.cnt = 0;
 
@@ -31,6 +39,12 @@ void fsm_process()
 
 	ans_buff_t ans_buff_st;
 	ans_buff_st.cnt = 0;
+#else
+	req_buff_st.cnt = 0;
+	dec_buff_st.cnt = 0;
+	ans_buff_st.cnt = 0;
+#endif
+
 	
 	recv_st_t 	recv_st;
 	handle_st_t handle_st;
@@ -65,7 +79,7 @@ void fsm_process()
 								state = purge_state;
 								break;
 
-		case purge_state:		purge(&req_buff_st);
+		case purge_state:		purge(&req_buff_st, &ans_buff_st);
 								state = receive_state;
 								break;
 
@@ -101,7 +115,7 @@ recv_st_t receive(req_buff_t *req_buff_st)
 	recv_st_t recv_st = recv_st_bad;
 
 	uint32_t *req_cnt = &(req_buff_st->cnt);
-	char *req_buff = (req_buff_st->buff);
+	buff_size_t *req_buff = (req_buff_st->buff);
 
 	static uint32_t timer = 0;
 	uint32_t usart_ticks;// = 0;
@@ -130,10 +144,10 @@ recv_st_t receive(req_buff_t *req_buff_st)
 void decode(const req_buff_t *req_buff_st, dec_buff_t *dec_buff_st)
 {
 	const uint32_t *req_cnt = &(req_buff_st->cnt);
-	const char *req_buff = (req_buff_st->buff);
+	const buff_size_t *req_buff = (req_buff_st->buff);
 
 	uint32_t *dec_cnt = &(dec_buff_st->cnt);
-	char *dec_buff = (dec_buff_st->buff);
+	buff_size_t *dec_buff = (dec_buff_st->buff);
 
 	kememcpy(dec_buff, req_buff, *req_cnt);
 	*dec_cnt = *req_cnt;
@@ -141,12 +155,41 @@ void decode(const req_buff_t *req_buff_st, dec_buff_t *dec_buff_st)
 
 handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st)
 {
+	const char ok_char = 'O';
+	const char bad_char = 'B';
+	const char none_char = 'N';
+	char ans_char;
+#if 0
 	const char reset_str[] = "Reset...\r";
 	const char gomain_str[] = "Gomain...\r";
 	const char info_str[] = "I'm  bloader!\r";
 	const char no_savvy_str[] = "No savvy @_@\r";
 	const char *ans_str;
+#endif
 
+	uint32_t *ans_cnt = &(ans_buff_st->cnt);
+	buff_size_t *ans_buff = (ans_buff_st->buff);
+
+	handle_st_t handle_st = bloader_handle(dec_buff_st, ans_buff_st);
+	switch(handle_st) {
+	case handle_st_bad:	ans_char = bad_char;
+						break;
+
+	case handle_st_res:	ans_char = ok_char;
+						break;
+
+	default:			ans_char = none_char;
+	}
+
+	if(handle_st != handle_st_main)
+		handle_st = handle_st_res;
+
+	*ans_cnt += sizeof(char);
+	ans_buff[0] = ans_char;
+	//ans_buff[*ans_cnt] = '\0';
+
+	return handle_st;
+#if 0
 	const uint32_t *dec_cnt = &(dec_buff_st->cnt);
 	const char *dec_buff = (dec_buff_st->buff);
 
@@ -158,8 +201,7 @@ handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st)
 	if(!(*dec_cnt))
 		return handle_st_bad;
 
-	char command = dec_buff[0];
-	switch(command) {
+	char command = dec_buff[0]; switch(command) {
 	case 'R': 	handle_st = handle_st_rst;	
 				ans_str = reset_str;	
 				break;
@@ -178,21 +220,24 @@ handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st)
 	kememcpy(ans_buff, ans_str, *ans_cnt);
 
 	return handle_st;
+#endif
 }
 
 void respond(const ans_buff_t *ans_buff_st)
 {
 	const uint32_t *ans_cnt = &(ans_buff_st->cnt);
-	const char *ans_buff = (ans_buff_st->buff);
+	const buff_size_t *ans_buff = (ans_buff_st->buff);
 	
 	if(*ans_cnt)
-		usart_put_buff(&usart1, ans_buff, *ans_cnt);
+		usart_put_buff(&usart1, ans_buff, (*ans_cnt) * sizeof(buff_size_t));
 }
 
-void purge(req_buff_t *req_buff_st)
+void purge(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st)
 {
 	uint32_t *req_cnt = &(req_buff_st->cnt);
+	uint32_t *ans_cnt = &(ans_buff_st->cnt);
 	*req_cnt = 0;
+	*ans_cnt = 0;
 }
 
 #if 1

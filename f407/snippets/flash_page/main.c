@@ -13,32 +13,38 @@ int main(void)
 	gpio_init(&led1_pin);
 	usart_init(&usart1);
 
-	//const uint32_t page_addr = flash_sector9_addr + 0x100;
-	const uint32_t page_addr = flash_sector2_addr;
-	const uint32_t write_data = 0xDEADBEEF;
-	uint32_t read_data;
+	const uint32_t page_addr = flash_sector9_addr;
+	const uint32_t page_size = 256; /*bytes*/
+	const uint32_t data_len = 64;
+	uint32_t write_data[data_len];
+	uint32_t read_data[data_len];
 	flash_status_t status;
+	uint32_t i;
 
-	/********************write***********************/
+	for(i = 0; i < data_len; i++)
+		write_data[i] = 0xEFBEADDE;
+
+	/********************write************************/
+#if 1
 	flash_unlock();
 	status = flash_erase(page_addr);
-	if(status == flash_ok) {
-		status = flash_write(page_addr, write_data);
-		usart_put_uint32(write_data);
-	}
-	flash_lock();
-	/*flash_put_status(status);*/
-	/********************write***********************/
-
-	/********************read************************/
-	flash_unlock();
-	status = flash_read(page_addr, &read_data);
-	flash_lock();
-
 	if(status == flash_ok)
-		usart_put_uint32(read_data);
-	/*flash_put_status(status);*/
+		status = flash_write_page(page_addr, write_data, page_size);
+	flash_lock();
+	/********************write************************/
+
 	/********************read************************/
+	if(status == flash_ok)
+#endif 
+		status = flash_read_page(page_addr, read_data, page_size);
+	if(status == flash_ok) {
+		for(i = 0; i < data_len; i++) {
+			usart_put_uint32(read_data[i]);
+		}
+	}
+	/********************read************************/
+
+	flash_put_status(status);
 	
 	while(1) {
 	}

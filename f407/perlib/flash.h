@@ -2,6 +2,7 @@
 #define FLASH_H_SENTRY
 
 #include <stm32f4xx.h>
+#define ERASEDEBUG
 
 typedef enum {
 	flash_bad_addr_err,
@@ -25,6 +26,10 @@ enum {
  * 			Middle sectors:	4
  * 			Large sectors:	5, 6, 7, 8, 9, 10, 11
  */
+
+enum {
+	flash_addr_offset = 0x04
+};
 
 enum {
 	flash_start_addr		= 0x08000000,
@@ -57,10 +62,14 @@ enum {
 	large_sector_size		= flash_sector6_addr - flash_sector5_addr
 };
 
-//void flash_unlock();
-//void flash_lock();
-flash_status_t flash_write(uint32_t page_addr, const uint32_t data);
-flash_status_t flash_read(uint32_t page_addr, uint32_t *data);
-flash_status_t flash_erase(uint32_t page_addr);
+#ifdef ERASEDEBUG
+void flash_unlock();
+void flash_lock();
+#endif
+flash_status_t flash_write(const uint32_t data_addr, const uint32_t data);
+flash_status_t flash_write_page(const uint32_t page_addr, const uint32_t *data, const uint32_t page_size);
+flash_status_t flash_read(const uint32_t data_addr, uint32_t *data);
+flash_status_t flash_read_page(const uint32_t page_addr, uint32_t *data, const uint32_t page_size);
+flash_status_t flash_erase(const uint32_t sector_addr);
 
 #endif

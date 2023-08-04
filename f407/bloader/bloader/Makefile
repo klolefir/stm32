@@ -7,7 +7,7 @@ CPPFLAGS = -DSTM32F407xx \
 		   -I ../general 
 LINKER_FILE = ../general/link_bloader.ld
 LDFLAGS = -T $(LINKER_FILE) -Wall -g -nostdlib
-MAIN_SOURCES = main.c fsm.c
+MAIN_SOURCES = main.c fsm.c bloader.c init.c
 GENERAL_SOURCES =  ../general/startup.c ../general/kestring.c
 STARTUP_SOURCES =  ../../vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c
 PERLIB_SOURCES = 	../../perlib/systick.c	\
@@ -17,6 +17,7 @@ PERLIB_SOURCES = 	../../perlib/systick.c	\
 					../../perlib/usart.c	\
 					../../perlib/tim.c		\
 					../../perlib/tim_hd.c	\
+					../../perlib/flash.c	\
 					../../perlib/general.c
 
 SOURCES = $(MAIN_SOURCES) $(GENERAL_SOURCES) $(STARTUP_SOURCES) $(PERLIB_SOURCES)
