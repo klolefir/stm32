@@ -1,9 +1,11 @@
+#include <stddef.h>
+
 #include "tim.h"
 #include "tim_hd.h"
 #include "nvic.h"
 #include "rcc.h"
+#include "general.h"
 
-#include <stddef.h>
 
 static TIM_TypeDef *switch_tim(const tim_t *tim_setup);
 static nvic_irqn_t switch_irqn(const tim_t *tim_setup);

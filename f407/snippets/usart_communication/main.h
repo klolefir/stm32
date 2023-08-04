@@ -5,6 +5,7 @@
 #include "rcc.h"
 #include "usart.h"
 #include "tim.h"
+#include "general.h"
 
 void enable_irq();
 

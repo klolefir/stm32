@@ -2,7 +2,6 @@
 #define TIM_H_SENTRY
 
 #include <stm32f4xx.h>
-#include <general.h>
 
 typedef uint32_t tim_psc_t;
 typedef uint32_t tim_arr_t;
