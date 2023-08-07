@@ -1,4 +1,5 @@
 #include "systick.h"
+#include "rcc.h"
 
 static volatile uint32_t ticks = 0;
 
@@ -52,7 +53,8 @@ void systick_disable()
 
 void systick_set_freq(const uint32_t freq)
 {
-	SysTick->LOAD = SystemCoreClock / freq;
+	uint32_t clk = rcc_get_system_clk();
+	SysTick->LOAD = clk / freq;
 }
 
 void systick_reset()

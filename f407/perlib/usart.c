@@ -2,6 +2,7 @@
 #include "nvic.h"
 #include "gpio.h"
 #include "rcc.h"
+#include "kestring.h"
 
 static void usart_init_gpio(usart_t *usart_st)
 {
@@ -77,7 +78,9 @@ void usart_init(usart_t *usart_st)
 	usart->CR1 |= (tx_int_st << USART_CR1_TXEIE_Pos);
 	usart->CR1 |= (rx_int_st << USART_CR1_RXNEIE_Pos);
 
-	usart->BRR = (SystemCoreClock / rcc_bus_div) / (usart_st->baud);
+	uint32_t clk = rcc_get_system_clk();
+	//usart->BRR = (SystemCoreClock / rcc_bus_div) / (usart_st->baud);
+	usart->BRR = (clk / rcc_bus_div) / (usart_st->baud);
 	usart->CR1 |= USART_CR1_UE;
 }
 
@@ -152,14 +155,14 @@ void usart_put_char(usart_t *usart_st, const char c)
 	usart->DR = c;
 }
 
-#if 0
+#if 1
 void usart_put_uint32(usart_t *usart_st, const uint32_t data)
 {
 	char data_str[6];
 	kememcpy(data_str, &data, sizeof(uint32_t));
 	data_str[4] = '\r';
 	data_str[5] = '\0';
-	usart_put_str(&usart_st, data_str);
+	usart_put_str(usart_st, data_str);
 }
 #endif
 

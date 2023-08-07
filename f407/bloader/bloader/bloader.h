@@ -23,6 +23,7 @@ enum {
 #endif
 
 enum {
+	bl_clk_cmd = 'C',
 	bl_test_cmd = 'T',
 	bl_lock_cmd = 'L',
 	bl_unlock_cmd = 'U',

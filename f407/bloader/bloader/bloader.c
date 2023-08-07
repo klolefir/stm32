@@ -23,6 +23,10 @@ handle_st_t bloader_handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_s
 
 	uint8_t cmd = dec_buff[bl_cmd_pos];
 	switch(cmd) {
+	case bl_clk_cmd:	usart_put_uint32(&usart1, rcc_get_system_clk() / 1000000);
+						handle_st = handle_st_res;
+						break;
+
 	case bl_unlock_cmd:	handle_st = bloader_unlock();
 						break;
 

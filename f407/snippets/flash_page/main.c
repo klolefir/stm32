@@ -1,6 +1,8 @@
 #include "main.h"
 
+#if 0
 void usart_put_uint32(uint32_t data);
+#endif
 void flash_put_status(flash_status_t status);
 void flash_write_test();
 void flash_read_test();
@@ -39,12 +41,14 @@ int main(void)
 		status = flash_read_page(page_addr, read_data, page_size);
 	if(status == flash_ok) {
 		for(i = 0; i < data_len; i++) {
-			usart_put_uint32(read_data[i]);
+			usart_put_uint32(&usart1, read_data[i]);
 		}
 	}
 	/********************read************************/
 
 	flash_put_status(status);
+
+	usart_put_uint32(&usart1, rcc_get_system_clk() / 1000000);
 	
 	while(1) {
 	}
@@ -63,6 +67,7 @@ void flash_put_status(flash_status_t status)
 	}
 }
 
+#if 0
 void usart_put_uint32(uint32_t data)
 {
 	char data_str[6];
@@ -71,3 +76,4 @@ void usart_put_uint32(uint32_t data)
 	data_str[5] = '\0';
 	usart_put_str(&usart1, data_str);
 }
+#endif
