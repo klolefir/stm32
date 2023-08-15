@@ -2,60 +2,75 @@
 #include "general.h"
 
 
+#ifndef ERASEDEBUG
+static flash_status_t flash_erase(const uint32_t sector_addr);
+static void flash_unlock();
+static void flash_lock();
+#endif
 static flash_lock_status_t flash_check_lock();
 static void flash_wait_until_bsy();
 static flash_status_t flash_switch_sector(const uint32_t page_addr, uint32_t *mask);
 
-flash_status_t flash_write(/*const*/ uint32_t data_addr, /*const*/ uint32_t data)
-{
-	while(FLASH->SR & FLASH_SR_BSY) {}
-	FLASH->CR |= FLASH_CR_PSIZE_1;
-	FLASH->CR |= FLASH_CR_PG;
-	while(FLASH->SR & FLASH_SR_BSY) {}
-	*(uint32_t *)data_addr = data;
-	while(FLASH->SR & FLASH_SR_BSY) {}
-	FLASH->CR &= ~FLASH_CR_PG;
-	return flash_ok;
-}
-
-flash_status_t flash_read(const uint32_t data_addr, uint32_t *data)
+void flash_init()
 {
 	flash_unlock();
-
-	flash_wait_until_bsy();
-	*data = *(uint32_t *)data_addr;
-	flash_wait_until_bsy();
-
+	FLASH->CR &= ~FLASH_CR_PSIZE;
+	FLASH->CR |= FLASH_CR_PSIZE_1;
 	flash_lock();
-
-	return flash_ok;
 }
 
-flash_status_t flash_erase(const uint32_t sector_addr)
+
+flash_status_t flash_write(const uint32_t data_addr, const uint32_t data)
 {
-	uint32_t sector_mask;
-	flash_status_t status = flash_switch_sector(sector_addr, &sector_mask);
+#if 0
+	flash_lock_status_t lock_status = flash_check_lock();
+	if(lock_status == flash_locked)
+		return flash_lock_err;
+#endif
+
+
+#ifndef ERASEDEBUG
+	flash_unlock();
+
+	flash_status_t status = flash_erase(data_addr);
 	if(status != flash_ok)
 		return status;
+#endif
 
-	while(FLASH->SR & FLASH_SR_BSY) {}
+	flash_wait_until_bsy();
+#if 0
+	clear_reg(&FLASH->CR);
+	set_bit(&FLASH->CR, FLASH_CR_PG);		//enable flash programming
+	set_bit(&FLASH->CR, FLASH_CR_PSIZE_1);	//word access
+#endif
+	//FLASH->CR = 0;
+	//FLASH->CR |= FLASH_CR_PG | FLASH_CR_PSIZE_1;
+	FLASH->CR |= FLASH_CR_PG;
+	flash_wait_until_bsy();
+	*(uint32_t *)data_addr = data;
 
-	FLASH->CR |= FLASH_CR_PSIZE_1;
-	FLASH->CR |= FLASH_CR_SER;
-	FLASH->CR |= sector_mask;
-	FLASH->CR |= FLASH_CR_STRT;
+	flash_wait_until_bsy();
 
-	while(FLASH->SR & FLASH_SR_BSY) {}
+	FLASH->CR &= ~FLASH_CR_PG;
 
-	FLASH->CR &= ~FLASH_CR_SER;
+	//FLASH->CR &= ~(FLASH_CR_PG | FLASH_CR_PSIZE);
+#if 0
+	clear_reg(&FLASH->CR);
+#endif
+
+#ifndef ERASEDEBUG
+	flash_lock();
+#endif
 
 	return flash_ok;
 }
 
-flash_status_t flash_write_page(/*const*/ uint32_t page_addr, /*const*/ uint32_t *data, /*const*/ uint32_t page_size)
+flash_status_t flash_write_page(const uint32_t page_addr, const uint32_t *data, const uint32_t page_size)
 {
-	/*const*/ uint32_t *write_data;
-	/*const*/ uint32_t data_size = sizeof(uint32_t);
+	//const uint32_t page_addr = flash_sector9_addr;
+	//const uint32_t page_size = 256; /*bytes*/
+	const uint32_t *write_data;
+	const uint32_t data_size = sizeof(uint32_t);
 	uint32_t addr;
 	flash_status_t status;
 	int i;
@@ -73,10 +88,10 @@ flash_status_t flash_write_page(/*const*/ uint32_t page_addr, /*const*/ uint32_t
 	return status;
 }
 
-flash_status_t flash_read_page(/*const*/ uint32_t page_addr, uint32_t *data, /*const*/ uint32_t page_size)
+flash_status_t flash_read_page(const uint32_t page_addr, uint32_t *data, const uint32_t page_size)
 {
 	uint32_t *read_data;
-	/*const*/ uint32_t data_size = sizeof(uint32_t);
+	const uint32_t data_size = sizeof(uint32_t);
 	uint32_t addr;
 
 	flash_status_t status;
@@ -92,6 +107,24 @@ flash_status_t flash_read_page(/*const*/ uint32_t page_addr, uint32_t *data, /*c
 	/********************read************************/
 
 	return status;
+}
+
+flash_status_t flash_read(const uint32_t data_addr, uint32_t *data)
+{
+#if 0
+	flash_lock_status_t lock_status = flash_check_lock();
+	if(lock_status == flash_locked)
+		return flash_lock_err;
+#endif
+	flash_unlock();
+
+	flash_wait_until_bsy();
+
+	*data = *(uint32_t *)data_addr;
+
+	flash_lock();
+
+	return flash_ok;
 }
 
 void flash_unlock()
@@ -111,9 +144,47 @@ void flash_lock()
 	flash_lock_status_t status;
 	status = flash_check_lock();
 	if(status == flash_unlocked)
-		FLASH->CR |= FLASH_CR_LOCK;
+		set_bit(&FLASH->CR, FLASH_CR_LOCK);
 }
 
+flash_status_t flash_erase(const uint32_t sector_addr)
+{
+#ifndef ERASEDEBUG 
+	flash_unlock();
+#endif
+
+	uint32_t sector_mask;
+	flash_status_t status = flash_switch_sector(sector_addr, &sector_mask);
+	if(status != flash_ok)
+		return status;
+
+	flash_wait_until_bsy();
+
+#if 0
+	set_bit(&FLASH->CR, FLASH_CR_SER);				//enable sector erase
+	set_bit(&FLASH->CR, sector_mask);				//set sector
+	set_bit(&FLASH->CR, FLASH_CR_STRT);				//start erase
+#endif
+	FLASH->CR |= FLASH_CR_SER; 
+	FLASH->CR |= sector_mask;
+	FLASH->CR |= FLASH_CR_STRT;
+
+	flash_wait_until_bsy();
+
+	FLASH->CR &= ~FLASH_CR_SER;
+
+	//FLASH->CR &= ~(FLASH_CR_SER | FLASH_CR_STRT);
+#if 0
+	clear_bit(&FLASH->CR, FLASH_CR_SER);
+	clear_reg(&FLASH->CR);
+#endif
+
+#ifndef ERASEDEBUG 
+	flash_lock();
+#endif
+
+	return flash_ok;
+}
 
 void flash_wait_until_bsy()
 {

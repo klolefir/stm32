@@ -179,12 +179,14 @@ void usart_put_str(usart_t *usart_st, const char *str)
 
 void usart_put_buff(usart_t *usart_st, const void *buff, const uint32_t byte_num)
 {
-	USART_TypeDef *usart = usart_st->usart;
+	//USART_TypeDef *usart = usart_st->usart;
 	uint8_t *buff_ptr = (uint8_t *)buff;
-	for(uint32_t i = 0; i < byte_num; i++) {
-		while(!(usart->SR & USART_SR_TXE)) {}
-		usart->DR = *buff_ptr;
-		buff_ptr++;
+	char c;
+	int i;
+	for(i = 0; i < byte_num; i++) {
+	//	while(!(usart->SR & USART_SR_TXE)) {}
+		c = buff_ptr[i];
+		usart_put_char(usart_st, c);
 	}
 }
 

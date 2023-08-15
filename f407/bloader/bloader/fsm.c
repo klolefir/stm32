@@ -18,34 +18,26 @@ static void purge(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st);
 static void reset();
 static void deinit();
 static void gomain();
+static void error(ans_buff_t *ans_buff_st);
 
 fsm_state_t switch_state_after_recv(const recv_st_t recv_status);
 fsm_state_t switch_state_after_handle(const handle_st_t handle_status);
 
 req_buff_t req_buff_st;
-
 dec_buff_t dec_buff_st;
-
 ans_buff_t ans_buff_st;
 
 void fsm_process()
 {
-#if 0
-	req_buff_t req_buff_st;
+	//req_buff_t req_buff_st;
 	req_buff_st.cnt = 0;
 
-	dec_buff_t dec_buff_st;
+	//dec_buff_t dec_buff_st;
 	dec_buff_st.cnt = 0;
 
-	ans_buff_t ans_buff_st;
+	//ans_buff_t ans_buff_st;
 	ans_buff_st.cnt = 0;
-#else
-	req_buff_st.cnt = 0;
-	dec_buff_st.cnt = 0;
-	ans_buff_st.cnt = 0;
-#endif
 
-	
 	recv_st_t 	recv_st;
 	handle_st_t handle_st;
 
@@ -75,6 +67,10 @@ void fsm_process()
 								state = switch_state_after_handle(handle_st);
 								break;
 
+		case error_state:		error(&ans_buff_st);
+								state = respond_state;
+								break;
+
 		case respond_state:		respond(&ans_buff_st);
 								state = purge_state;
 								break;
@@ -92,6 +88,7 @@ void fsm_process()
 
 		case reset_state:		reset();
 								break;
+
 		}
 	}
 }
@@ -155,22 +152,21 @@ void decode(const req_buff_t *req_buff_st, dec_buff_t *dec_buff_st)
 
 handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st)
 {
+#if 0
 	const char ok_char = 'O';
 	const char bad_char = 'B';
 	const char none_char = 'N';
 	char ans_char;
-#if 0
 	const char reset_str[] = "Reset...\r";
 	const char gomain_str[] = "Gomain...\r";
 	const char info_str[] = "I'm  bloader!\r";
 	const char no_savvy_str[] = "No savvy @_@\r";
 	const char *ans_str;
-#endif
 
 	uint32_t *ans_cnt = &(ans_buff_st->cnt);
 	buff_size_t *ans_buff = (ans_buff_st->buff);
 
-	handle_st_t handle_st = bloader_handle(dec_buff_st, ans_buff_st);
+
 	switch(handle_st) {
 	case handle_st_bad:	ans_char = bad_char;
 						break;
@@ -187,7 +183,9 @@ handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st)
 	*ans_cnt += sizeof(char);
 	ans_buff[0] = ans_char;
 	//ans_buff[*ans_cnt] = '\0';
+#endif
 
+	handle_st_t handle_st = bloader_handle(dec_buff_st, ans_buff_st);
 	return handle_st;
 #if 0
 	const uint32_t *dec_cnt = &(dec_buff_st->cnt);
@@ -223,13 +221,25 @@ handle_st_t handle(const dec_buff_t *dec_buff_st, ans_buff_t *ans_buff_st)
 #endif
 }
 
+void error(ans_buff_t *ans_buff_st)
+{
+	//err_t err = get_err()
+	//switch(err) { ... }
+	uint32_t *ans_cnt = &(ans_buff_st->cnt);
+	buff_size_t *ans_buff = (ans_buff_st->buff);
+
+	const char err_str[] = "Error!\r";	
+	*ans_cnt = kestrlen(err_str);
+	kememcpy(ans_buff, err_str, *ans_cnt);
+}
+
 void respond(const ans_buff_t *ans_buff_st)
 {
-	const uint32_t *ans_cnt = &(ans_buff_st->cnt);
+	const uint32_t ans_cnt = ans_buff_st->cnt;
 	const buff_size_t *ans_buff = (ans_buff_st->buff);
 	
-	if(*ans_cnt)
-		usart_put_buff(&usart1, ans_buff, (*ans_cnt) * sizeof(buff_size_t));
+	if(ans_cnt)
+		usart_put_buff(&usart1, ans_buff, ans_cnt);
 }
 
 void purge(req_buff_t *req_buff_st, ans_buff_t *ans_buff_st)
@@ -290,13 +300,19 @@ fsm_state_t switch_state_after_handle(const handle_st_t handle_st)
 	switch(handle_st) {
 	case handle_st_rst:		next_state = reset_state;
 							break;
+
 	case handle_st_main:	next_state = deinit_state;
 							break;
+
 	case handle_st_res:		next_state = respond_state;
 							break;
 
-	case handle_st_bad:
+	case handle_st_bad:		next_state = error_state;
+							break;
+
 	default:				next_state = purge_state;
+							break;
 	}
 	return next_state;
 }
+

@@ -10,7 +10,7 @@ extern usart_t usart1;
 extern tim_t usart_tim;
 extern gpio_t led1_pin;
 
-typedef uint32_t buff_size_t;
+typedef uint8_t buff_size_t;
 
 enum {
 	//main_addr 	= 0x08008000,
@@ -20,9 +20,9 @@ enum {
 };
 
 enum {
-	req_buff_len = 128,
-	dec_buff_len = 128,
-	ans_buff_len = 128
+	req_buff_len = 1024,
+	dec_buff_len = 1024,
+	ans_buff_len = 1024
 };
 
 typedef struct {

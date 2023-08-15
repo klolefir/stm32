@@ -22,7 +22,9 @@ typedef enum {
 	tim6_irqn 	= TIM6_DAC_IRQn,
 	tim7_irqn 	= TIM7_IRQn,
 	usart1_irqn = USART1_IRQn,
-	usart2_irqn = USART2_IRQn
+	usart2_irqn = USART2_IRQn,
+	spi1_irqn = SPI1_IRQn,
+	spi2_irqn = SPI2_IRQn
 } nvic_irqn_t;
 
 void nvic_enable_irq(nvic_irqn_t irqn);

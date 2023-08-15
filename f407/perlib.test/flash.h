@@ -3,6 +3,8 @@
 
 #include <stm32f4xx.h>
 
+#define ERASEDEBUG
+
 typedef enum {
 	flash_bad_addr_err,
 	flash_lock_err,
@@ -61,12 +63,15 @@ enum {
 	large_sector_size		= flash_sector6_addr - flash_sector5_addr
 };
 
+#ifdef ERASEDEBUG
 void flash_unlock();
 void flash_lock();
-flash_status_t flash_write(uint32_t data_addr, uint32_t data);
-flash_status_t flash_write_page(uint32_t page_addr, uint32_t *data, uint32_t page_size);
-flash_status_t flash_read(uint32_t data_addr, uint32_t *data);
-flash_status_t flash_read_page(uint32_t page_addr, uint32_t *data, uint32_t page_size);
-flash_status_t flash_erase(uint32_t sector_addr);
+#endif
+void flash_init();
+flash_status_t flash_write(const uint32_t data_addr, const uint32_t data);
+flash_status_t flash_write_page(const uint32_t page_addr, const uint32_t *data, const uint32_t page_size);
+flash_status_t flash_read(const uint32_t data_addr, uint32_t *data);
+flash_status_t flash_read_page(const uint32_t page_addr, uint32_t *data, const uint32_t page_size);
+flash_status_t flash_erase(const uint32_t sector_addr);
 
 #endif

@@ -7,13 +7,8 @@ CPPFLAGS = -DSTM32F407xx \
 		   -I ../general
 LINKER_FILE = ../general/link.ld
 LDFLAGS = -T $(LINKER_FILE) -Wall -g -nostdlib
-SOURCES = main.c ../general/startup.c ../general/kestring.h ../../vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c
-SOURCES += 	../../perlib/usart.c	\
-			../../perlib/tim.c	\
-			../../perlib/rcc.c	\
-			../../perlib/nvic.c	\
-			../../perlib/gpio.c	\
-			../../perlib/general.c
+SOURCES = main.c ../general/startup.c ../../vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c ../general/kestring.c
+SOURCES += ../../perlib/*
 
 all: firmware.elf
 

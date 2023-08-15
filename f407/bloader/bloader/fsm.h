@@ -13,6 +13,7 @@ typedef enum {
 	respond_state,
 	purge_state,
 	reset_state,
+	error_state,
 #if 1
 	deinit_state,
 	gomain_state

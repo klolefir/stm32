@@ -15,23 +15,25 @@ int main(void)
 	gpio_init(&led1_pin);
 	usart_init(&usart1);
 
-	const uint32_t page_addr = flash_sector8_addr;
-	const uint32_t page_size = 256; /*bytes*/
-	const uint32_t data_len = 64;
+	uint32_t page_addr = flash_sector8_addr;
+	uint32_t page_size = 256; /*bytes*/
+	uint32_t data_len = 64;
 	uint32_t write_data[data_len];
 	uint32_t read_data[data_len];
 	flash_status_t status;
 	uint32_t i;
 
 	for(i = 0; i < data_len; i++) {
-		//write_data[i] = 0x12345678;
-		write_data[i] = 0xBDBDBDBD;
+		write_data[i] = 0xEFBEADDE;
+//		write_data[i] = 0xBDBDBDBD;
 	}
 
 	/********************write************************/
+	//flash_init();
 #if 1
 	flash_unlock();
 	status = flash_erase(page_addr);
+#if 0
 	if((FLASH->SR & FLASH_SR_PGAERR))
 		usart_put_str(&usart1, "PGAERR\r");
 	if((FLASH->SR & FLASH_SR_PGSERR))
@@ -40,11 +42,13 @@ int main(void)
 		usart_put_str(&usart1, "PGPERR\r");
 	if((FLASH->SR & FLASH_SR_WRPERR))
 		usart_put_str(&usart1, "WRPERR\r");
+#endif
 //	flash_lock();
 
 //	flash_unlock();
 	if(status == flash_ok) {
 		status = flash_write_page(page_addr, write_data, page_size);
+#if 0
 		if((FLASH->SR & FLASH_SR_PGAERR))
 			usart_put_str(&usart1, "PGAERR\r");
 		if((FLASH->SR & FLASH_SR_PGSERR))
@@ -53,6 +57,7 @@ int main(void)
 			usart_put_str(&usart1, "PGPERR\r");
 		if((FLASH->SR & FLASH_SR_WRPERR))
 			usart_put_str(&usart1, "WRPERR\r");
+#endif
 	}
 	flash_lock();
 	/********************write************************/
@@ -61,6 +66,16 @@ int main(void)
 	if(status == flash_ok)
 #endif 
 	status = flash_read_page(page_addr, read_data, page_size);
+#if 1
+	if((FLASH->SR & FLASH_SR_PGAERR))
+		usart_put_str(&usart1, "PGAERR\r");
+	if((FLASH->SR & FLASH_SR_PGSERR))
+		usart_put_str(&usart1, "PGSERR\r");
+	if(FLASH->SR & FLASH_SR_PGPERR)
+		usart_put_str(&usart1, "PGPERR\r");
+	if((FLASH->SR & FLASH_SR_WRPERR))
+		usart_put_str(&usart1, "WRPERR\r");
+#endif
 	if(status == flash_ok) {
 		for(i = 0; i < data_len; i++) {
 			usart_put_uint32(&usart1, read_data[i]);

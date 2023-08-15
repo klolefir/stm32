@@ -50,7 +50,10 @@ typedef enum {
 	gpio_alt_tim5 	= gpio_alt_tim3,
 	gpio_alt_usart1	= 0b0111,
 	gpio_alt_usart2	= gpio_alt_usart1,
-	gpio_alt_usart3	= gpio_alt_usart1
+	gpio_alt_usart3	= gpio_alt_usart1,
+	gpio_alt_spi1	= 0b101,
+	gpio_alt_spi2	= gpio_alt_spi1,
+	gpio_alt_spi3	= 0b110
 } gpio_alt_t;
 
 typedef struct {
