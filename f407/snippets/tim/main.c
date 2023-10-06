@@ -17,6 +17,6 @@ void tim6_dac_handler()
 	uint8_t is_tim6 = read_bit(&TIM6->SR, TIM_SR_UIF);
 	if(is_tim6) {
 		clear_bit(&TIM6->SR, TIM_SR_UIF);
-		gpio_tgl(&led1_pin);			
+		gpio_tgl(&led1_pin);
 	}
 }

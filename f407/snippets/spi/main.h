@@ -37,6 +37,16 @@ static gpio_t led1_pin = {
 };
 #endif
 
+static gpio_t cs_pin = { 
+	.port = gpio_port_a, 
+	.mask = 9,
+	.mode = gpio_mode_output, 
+	.otype = gpio_otype_pp,
+	.ospeed = gpio_ospeed_vhigh,
+	.pupd = gpio_pupd_pu,
+	.alt = gpio_alt_system
+};
+
 static spi_t spi1 = {
 	.num = spi_1,
 	.mode = spi_mode_master,

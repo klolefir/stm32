@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stm32f4xx.h>
 
+#include "systick.h"
 #include "gpio.h"
 #include "rcc.h"
 #include "usart.h"

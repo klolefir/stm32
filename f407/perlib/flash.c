@@ -40,7 +40,6 @@ flash_status_t flash_erase(const uint32_t sector_addr)
 
 	while(FLASH->SR & FLASH_SR_BSY) {}
 
-	FLASH->CR |= FLASH_CR_PSIZE_1;
 	FLASH->CR |= FLASH_CR_SER;
 	FLASH->CR |= sector_mask;
 	FLASH->CR |= FLASH_CR_STRT;

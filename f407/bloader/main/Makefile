@@ -30,7 +30,7 @@ firmware.bin: firmware.elf
 	arm-none-eabi-objcopy -O binary $< $@
 
 flash: firmware.bin
-	st-flash --reset write $< 0x8000000
+	st-flash --reset write $< 0x8008000
 
 dfu: firmware.bin
 	dfu-util -a 0 -s 0x08008000 -D $<

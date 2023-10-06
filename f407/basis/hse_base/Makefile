@@ -12,6 +12,12 @@ all: firmware.elf
 firmware.elf: $(SOURCES)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o firmware.elf
 
+ocdflash: $(BIN)
+	gdb-multiarch -x gdb.ctrl
+
+openocd:
+	/usr/bin/openocd -f /usr/share/openocd/scripts/interface/stlink.cfg -f /usr/share/openocd/scripts/target/stm32f4x.cfg
+
 firmware.bin: firmware.elf
 	arm-none-eabi-objcopy -O binary $< $@	
 

@@ -41,6 +41,17 @@ void tim_init(const tim_t *tim_setup)
 	set_bit(&tim->CR1, (pwr_st << TIM_CR1_CEN_Pos));
 }
 
+void tim_set_freq(const tim_t *tim_setup, uint32_t freq)
+{
+	TIM_TypeDef *tim = switch_tim(tim_setup);
+	tim_psc_t psc = 16800 / 4;
+	psc = psc - 1;
+	set_reg(&tim->PSC, psc);
+
+	tim_arr_t arr = 1000;
+	arr = arr - 1;
+	set_reg(&tim->ARR, arr);
+}
 
 void tim_enable(tim_t *tim_setup)
 {
@@ -101,8 +112,11 @@ uint32_t tim_get_ticks(const tim_t *tim_setup)
 
 	switch(tim_num) {
 	case tim_6:	ticks = tim6_get_ticks();
+				break;
 	case tim_7:	ticks = tim7_get_ticks();
+				break;
 	default:	ticks = 0;
+				break;
 	}
 
 	return ticks;
@@ -114,7 +128,9 @@ void tim_set_ticks(const tim_t *tim_setup, const uint32_t ticks)
 
 	switch(tim_num) {
 	case tim_6:	tim6_set_ticks(ticks);
+				break;
 	case tim_7:	tim7_set_ticks(ticks);
+				break;
 	default:	return;
 	}
 }

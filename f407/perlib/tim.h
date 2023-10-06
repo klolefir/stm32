@@ -37,6 +37,7 @@ typedef struct {
 } tim_t;
 
 void tim_init(const tim_t *tim_setup);
+void tim_set_freq(const tim_t *tim_setup, uint32_t freq);
 void tim_enable(tim_t *tim_setup);
 void tim_disable(tim_t *tim_setup);
 void tim_enable_irq(tim_t *tim_setup);
