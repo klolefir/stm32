@@ -2,50 +2,42 @@ ELF2BIN = arm-none-eabi-objcopy
 CC=arm-none-eabi-gcc
 
 USR = $(USER)
-PRJ_PATH = /home/$(USR)/projects/stm32/f407/snippets/usart_communication
+PRJ_PATH = /home/$(USR)/projects/stm32/f407/snippets/blink
 F407_PATH = /home/$(USR)/projects/stm32/f407
 VENDOR_PATH = $(F407_PATH)/vendor
 CMSIS_PATH = $(VENDOR_PATH)/cmsis
 F407LIB_PATH = $(VENDOR_PATH)/stm32f4x
 PERLIB_PATH = $(F407_PATH)/perlib
-KELIB_PATH = $(F407_PATH)/kelib
 OPTIMIZATION = -O0
 
 CFLAGS = -Wall -g -mcpu=cortex-m4 -mthumb $(OPTIMIZATION)
 
 MACRO = -D STM32F407xx
-MAIN_INC 	= -I ./
-VENDOR_INC 	= 	-I $(CMSIS_PATH) \
+VENDOR_INC = 	-I $(CMSIS_PATH) \
 				-I $(F407LIB_PATH)/inc
-PERLIB_INC 	= -I $(PERLIB_PATH)
-KELIB_INC 	= -I $(KELIB_PATH)
+PERLIB_INC = -I $(PERLIB_PATH)
 
-INC = 	$(MAIN_INC) \
-		$(VENDOR_INC) \
-		$(PERLIB_INC) \
-		$(KELIB_INC)
+INC = 	$(VENDOR_INC) \
+		$(PERLIB_INC)
 
 CPPFLAGS = $(MACRO) $(INC)
 
 LINKER = $(F407_PATH)/general/link.ld
 LDFLAGS = -Wall -g -nostdlib -T $(LINKER)
 
-MAIN_SRC = $(PRJ_PATH)/main.c $(PRJ_PATH)/operator.c
+MAIN_SRC = $(PRJ_PATH)/main.c
 SYSTEM_SRC = $(F407LIB_PATH)/src/system_stm32f4xx.c
 PERLIB_SRC = $(PERLIB_PATH)/gpio.c \
 			 $(PERLIB_PATH)/rcc.c \
 			 $(PERLIB_PATH)/nvic.c \
 			 $(PERLIB_PATH)/tim.c \
 			 $(PERLIB_PATH)/tim_hd.c \
-			 $(PERLIB_PATH)/usart.c \
 			 $(PERLIB_PATH)/general.c
-KELIB_SRC = $(KELIB_PATH)/kestring.c
 STARTUP_SRC = $(F407_PATH)/general/startup.c
 SRC = 	$(MAIN_SRC) \
 		$(SYSTEM_SRC) \
 		$(STARTUP_SRC) \
-		$(PERLIB_SRC) \
-		$(KELIB_SRC)
+		$(PERLIB_SRC)
 
 ELF = firmware.elf
 BIN = firmware.bin

@@ -5,10 +5,16 @@
 #include "rcc.h"
 
 typedef enum {
+#if 0
 	gpio_port_a = gpioa_id,
 	gpio_port_b = gpiob_id,
 	gpio_port_c = gpioc_id,
 	gpio_port_d = gpiod_id
+#endif
+	gpio_port_a,
+	gpio_port_b,
+	gpio_port_c,
+	gpio_port_d
 } gpio_port_t;
 
 typedef enum {
@@ -57,8 +63,8 @@ typedef enum {
 } gpio_alt_t;
 
 typedef struct {
-	gpio_port_t 	port;
-	uint8_t 		mask;
+	gpio_port_t 	port	: 2;
+	uint8_t 		mask	: 4;
 	gpio_mode_t 	mode 	: 2;
 	gpio_otype_t 	otype 	: 1;
 	gpio_ospeed_t 	ospeed 	: 2;
@@ -66,9 +72,9 @@ typedef struct {
 	gpio_alt_t		alt		: 4;
 } gpio_t;
 
-void gpio_init(gpio_t *pin);
-void gpio_set(gpio_t *pin);
-void gpio_clr(gpio_t *pin);
-void gpio_tgl(gpio_t *pin);
+void gpio_init(const gpio_t *gpio_set);
+void gpio_set(const gpio_t *gpio_set);
+void gpio_clr(const gpio_t *gpio_set);
+void gpio_tgl(const gpio_t *gpio_set);
 
 #endif

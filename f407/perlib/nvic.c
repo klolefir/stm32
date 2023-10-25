@@ -1,8 +1,9 @@
 #include "nvic.h"
 
-void nvic_enable_irq(nvic_irqn_t irqn)
+void nvic_enable_irq(nvic_irqn_t irqn, nvic_irq_prior_t priority)
 {
 	NVIC_EnableIRQ(irqn);
+	NVIC_SetPriority(irqn, priority);
 }
 
 void nvic_disable_irq(nvic_irqn_t irqn)

@@ -1,21 +1,25 @@
-#include "main.h"
+#include "rcc.h"
+#include "operator.h"
 
 void receive_data();
 
 int main(void)
 {
-	rcc_init();
-	enable_irq();
+	buff_t buff;
+	recv_state_t recv_state;
 
-	usart_init(&usart1);
-	tim_init(&tim6);
-	
-	receive_data();
+	__enable_irq();
+	rcc_init();
+	operator_init();
 
 	while(1) {
+		recv_state = operator_receive(&buff);
+		if(recv_state == recv_state_ok)
+			operator_transmit(&buff);
 	}
 }
 
+#if 0
 void receive_data()
 {
 	const uint32_t req_buff_len = 1024;
@@ -38,12 +42,4 @@ void receive_data()
 		}
 	}
 }
-
-void tim6_dac_handler()
-{
-	uint8_t is_tim6 = read_bit(&TIM6->SR, TIM_SR_UIF);
-	if(is_tim6) {
-		clear_bit(&TIM6->SR, TIM_SR_UIF);
-		usart_ticks++;
-	}
-}
+#endif
